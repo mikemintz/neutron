@@ -1,0 +1,8 @@
+# Neutron Init script
+
+#rss_add_channel('jsf', 'http://www.jabber.org/news/rss.xml')
+#rss_add_channel('jplanet', 'http://planet.jabber.org/rss20.xml')
+#rss_add_channel('slashdot', 'http://www.slashdot.org/slashdot.rdf')
+#rss_subscribe('jsf', 'jabber@conf.jabber.comm')
+
+thread.start_new(rss_query_channels_loop, ())

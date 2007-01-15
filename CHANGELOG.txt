@@ -1,0 +1,33 @@
+# Neutron - a Jabber bot in Python
+# Changelog
+
+0.5 - 30/Sep/2005 - Badlop
+
+	* neutron.py: New --pid command line option, writes PID to a file. (Mikem)
+
+	* neutron.sh: New shell script to start and stop Neutron. (Badlop)
+
+	* neutron.py, plugins/admin_plugin.py: Invite-autojoin patch:
+	Anybody who has access to issue !join command will have access to send a 
+	protocol groupchat invite, all others will be ignored. (Mikem)
+
+	* plugins/rss_plugin.py: strip HTML tags on headline messages. (Mikem)
+
+	* plugins/weather_plugin.py: Little fixes. (Sef)
+
+	* plugins/sg_plugin.py: New plugin, shows server statistics with JEP-0039. (Sef)
+	* modules/xmpp/: XMPPpy updated to CVS, required by sg_plugin.py. (Sef)
+
+	* plugins/eliza_plugin.py: New plugin. (Sef)
+	* modules/eliza.py: New module, required by eliza_plugin.py. (Sef)
+
+	* localized/czech/: New plugins, only usefull to Czech people. (Sef)
+
+
+0.4.2 - 02/May/2005 - Badlop
+
+	* plugins/admin_plugin.py: fixed a bug about NICK (Mcsim)
+	* plugins/log_plugin.py: fixed a bug on href generation (Slisptream)
+
+	* 3hauka.txt, q.txt, quizdata.txt, zipcodes.txt: moved from neutron
+	package to a standalone neutron-extras package (Gonzo)

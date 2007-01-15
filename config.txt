@@ -1,0 +1,31 @@
+# Neutron configuration
+
+{
+# Jabber account where Neutron will login
+'SERVER': 'jabber.orgg',
+'PORT': 5222,
+'USERNAME': 'neutron',
+'PASSWORD': 'password',
+'RESOURCE': 'neutron' + str(random.randrange(1000, 9999)),
+
+# Chatroom nick
+'DEFAULT_NICK': 'neutron',
+
+# Jabber accounts that will administrate Neutron
+'ADMINS': ['mikem@jabber.orgg', 'neutron@jabber.orgg'],
+'ADMIN_PASSWORD': str(random.randrange(999999999)),
+
+# Neutron will try to reconnect on disconnections
+'AUTO_RESTART': 0,
+
+# Where to store HTML files from chatrooms logs
+# To disable logging, set to empty string: '',
+'PUBLIC_LOG_DIR': '/var/www/neutron',
+
+# Where to store logs of private chats
+# To disable logging, set to empty string: '',
+'PRIVATE_LOG_DIR': 'privatechatlogs',
+
+'INITSCRIPT_FILE': 'neutron.rc',
+
+}
