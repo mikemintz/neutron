@@ -230,8 +230,8 @@ def get_true_jid(jid):
 	if GROUPCHATS.has_key(stripped_jid):
 		if GROUPCHATS[stripped_jid].has_key(resource):
 			true_jid = string.split(unicode(GROUPCHATS[stripped_jid][resource]['jid']), '/', 1)[0]
-        else:
-            true_jid = stripped_jid
+		else:
+			true_jid = stripped_jid
 	else:
 		true_jid = stripped_jid
 	return true_jid
