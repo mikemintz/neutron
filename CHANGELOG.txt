@@ -1,6 +1,13 @@
 # Neutron - a Jabber bot in Python
 # Changelog
 
+0.X - XX/xxx/2007
+    * refactoring (transition to an object-oriented code)
+    * new plugin system
+    * port of few plugins (many useless plugins will not be ported)
+    * a lot of optimizations
+    * xmpppy updated to 0.4.0
+
 0.5 - 30/Sep/2005 - Badlop
 
 	* neutron.py: New --pid command line option, writes PID to a file. (Mikem)

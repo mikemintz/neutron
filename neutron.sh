@@ -13,7 +13,7 @@ case "$1" in
 		echo "ERROR: Neutron already started (PID file found)"
 		exit 1
 	fi
-	$NEUTRON --pid=$PIDFILE >/dev/null &
+	$NEUTRON --pid-file=$PIDFILE >/dev/null &
 	echo "done"
     ;;
   stop)

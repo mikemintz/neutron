@@ -2,9 +2,11 @@
     Neutron - a Jabber bot in Python
     --------------------------------
 
-     Copyright 2002-2005 Mike Mintz   http://www.mikemintz.com/
+     Copyright 2002-2006 Mike Mintz   http://www.mikemintz.com/
+     Copyright 2007 Mike Mintz <mikemintz@gmail.com>
+                    Anaël Verrier <elghinn@free.fr>
 
-     Version 0.5
+     Version 0.X
      http://ejabberd.jabber.ru/neutron
 
 
