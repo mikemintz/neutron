@@ -39,7 +39,7 @@ account where Neutron must login.
 4. Execute
 ./neutron.py
 
-6. Execute as different user in daemon mode (optional)
+5. Execute as different user in daemon mode (optional)
 su neutron -c "./neutron.py &"
 
 
