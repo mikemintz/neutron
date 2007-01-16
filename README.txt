@@ -23,27 +23,26 @@ presence, enter into chatrooms and answer to commands.
     Install
     -------
 
-# Get the package
-wget http://ejabberd.jabber.ru/files/other/neutron-0.5.tar.bz2
-tar -xjvf neutron-0.5.tar.bz2 
+1. Get the source code from the SVN repository
+svn checkout http://svn.hypothetic.org/neutron/trunk neutron
 
-# Prepare permissions (optional)
+2. Prepare permissions (optional)
 addgroup jabber
 adduser neutron
 adduser neutron jabber
 chown neutron:jabber neutron-0.5 -R
 chmod 750 neutron-0.5 -R
 
-cd neutron-0.5
+cd neutron
 
-# Configure
+3. Configure
 Edit config.txt and put the username, server and password of the Jabber
 account where Neutron must login.
 
-# Execute
+4. Execute
 ./neutron.py
 
-# Execute as different user in daemon mode (optional)
+5. Execute as different user in daemon mode (optional)
 su neutron -c "./neutron.py &"
 
 
@@ -154,4 +153,3 @@ to your roster and start to chat with him. Some example commands:
 - !commands should show only commands that the user has privileges enought to use
 
 - Give helpful error on invalid username/password for initial login
-- Get JabberStudio project up and running!

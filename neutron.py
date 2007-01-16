@@ -74,7 +74,7 @@ class Neutron:
         self.loaded_plugins = []
 
     def __del__(self):
-        if(self.options.pid_filename):
+        if(self.__dict__.has_key('options') and self.options.pid_filename):
             from os import unlink
             unlink(self.options.pid_filename)
 
@@ -133,6 +133,8 @@ if __name__ == '__main__':
         neutron.loop()
     except KeyboardInterrupt:
         print 'Keyboard Interrupt'
+    except SystemExit:
+        pass
     except:
         print_exc()
     print 'uptime: %s' % (str(datetime.now() - t0))
