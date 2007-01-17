@@ -5,13 +5,16 @@
     * refactoring (transition to an object-oriented code)
     * new plugin system
     * port of few plugins (many useless plugins will not be ported)
-    * a lot of optimizations
     * xmpppy updated to 0.4.0
     * ability to join pass protected chat rooms
     * modules/rwhois.py: updated to 1.5
     * new --help command line option, shows help message and exit
     * new --config-file command line option, to specify a config file
     * renamed --pid command line option to --pid-file
+    * time granularity for plugin Log is seconds
+    * plugin Log create valid "XHTML 1.0 strict" pages!
+    * plugin Log: addition of a html link on each timestamp
+    * a lot of optimizations
 
 
 0.5 - 30/Sep/2005 - Badlop

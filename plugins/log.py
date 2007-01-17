@@ -23,9 +23,10 @@
 
 import re
 
+from math import modf
 from os import access, makedirs, path
 from os import F_OK
-from time import localtime, strftime
+from time import localtime, strftime, time
 
 class Log:
     def __init__(self):
@@ -56,6 +57,7 @@ class Log:
 <style type="text/css">
 <!--
 .timestamp {color: #aaa;}
+.timestamp a {color: #aaa; text-decoration: none;}
 .system {color: #090; font-weight: bold;}
 .emote {color: #a09;}
 .self {color: #c00;}
@@ -119,22 +121,6 @@ h2 { color: #639; font-family: sans-serif; letter-spacing: 2px; text-align: cent
                 self.log_write_header(fp, source, (year, month, day, hour, minute, second, weekday, yearday, daylightsavings))
                 return fp
 
-    def log_get_timestamp(self, hour, minute, second):
-        timestamp = '['
-        if hour < 10:
-            timestamp += '0'
-        timestamp += str(hour)
-        timestamp += ':'
-        if minute < 10:
-            timestamp += '0'
-        timestamp += str(minute)
-        timestamp += ':'
-        if second < 10:
-            timestamp += '0'
-        timestamp += str(second)
-        timestamp += ']'
-        return timestamp
-
     def log_regex_url(self, matchobj):
         # 06.03.05(Sun) slipstream@yandex.ru urls parser
         return '<a href="' + matchobj.group(0) + '">' + matchobj.group(0) + '</a>'
@@ -158,6 +144,7 @@ h2 { color: #639; font-family: sans-serif; letter-spacing: 2px; text-align: cent
 
     def log_write(self, body, nick, type, jid):
         jid = self.config.get_true_jid(jid)
+        decimal = str(int(modf(time())[0]*100000))
         (year, month, day, hour, minute, second, weekday, yearday, daylightsavings) = localtime()
         # 06.03.05(Sun) slipstream@yandex.ru urls parser & line ends
         body = body.replace('&', '&amp;').replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
@@ -165,9 +152,9 @@ h2 { color: #639; font-family: sans-serif; letter-spacing: 2px; text-align: cent
         body = body.replace('\n', '<br />')
         body = body.encode('utf-8');
         nick = nick.encode('utf-8');
-        timestamp = self.log_get_timestamp(hour, minute, second)
+        timestamp = '[%.2i:%.2i:%.2i]' % (hour, minute, second)
         fp = self.log_get_fp(type, jid, (year, month, day, hour, minute, second, weekday, yearday, daylightsavings))
-        fp.write('<span class="timestamp">' + timestamp + '</span> ')
+        fp.write('<span class="timestamp"><a id="t' + timestamp[1:-1] + '.' + decimal + '" href="#t' + timestamp[1:-1] + '.' + decimal + '">' + timestamp + '</a></span> ')
         if not nick:
             fp.write('<span class="system">' + body + '</span><br />\n')
         elif body[:3].lower() == '/me':
