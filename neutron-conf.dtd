@@ -1,0 +1,24 @@
+<!ELEMENT neutron-conf (server,port,username,password,resource,default-nick,admin*,admin-password,auto-restart,public-log-dir,private-log-dir,access*,groupchat*)>
+<!ELEMENT server (#PCDATA)>
+<!ELEMENT port (#PCDATA)>
+<!ELEMENT username (#PCDATA)>
+<!ELEMENT password (#PCDATA)>
+<!ELEMENT resource (#PCDATA|pid|random)*>
+<!ELEMENT default-nick (#PCDATA|pid|random)*>
+<!ELEMENT admin (#PCDATA)>
+<!ELEMENT admin-password (#PCDATA|pid|random)*>
+<!ELEMENT auto-restart (#PCDATA)>
+<!ELEMENT public-log-dir (#PCDATA|pid|random)*>
+<!ELEMENT private-log-dir (#PCDATA|pid|random)*>
+<!ELEMENT access EMPTY>
+<!ELEMENT groupchat (jid,nick?)>
+<!ATTLIST groupchat
+ autojoin CDATA #REQUIRED>
+<!ELEMENT jid (#PCDATA)>
+<!ELEMENT nick (#PCDATA)>
+<!ELEMENT pid EMPTY>
+<!ELEMENT random EMPTY>
+<!ATTLIST random
+ min CDATA #IMPLIED
+ max CDATA #IMPLIED
+ step CDATA #IMPLIED>

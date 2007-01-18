@@ -43,24 +43,20 @@ class Config(object):
         else:
             return
         self.filename = filename
-        #self.NICKS_CACHE_FILE = 'dynamic/chatnicks.cfg'
-        #self.ACCESS_FILE = 'dynamic/access.cfg'
-
         doc = xml_parse(self.filename)
         self.getElements = doc.documentElement.getElementsByTagName
-        self.server = self.getValue('server')
-        self.port = int(self.getValue('port'))
-        self.username = self.getValue('username')
-        self.password = self.getValue('password')
-        self.resource = self.getValue('resource',1)
-        self.default_nick = self.getValue('default-nick',1)
+        #nodes = [('node-name', parse?),...]
+        nodes = [('server', False), ('port', False),
+                 ('username', False), ('password', False),
+                 ('resource', True), ('default-nick', True),
+                 ('admin-password', True), ('auto-restart', False),
+                 ('public-log-dir', True), ('private-log-dir', True)]
+        selfdict = self.__dict__
+        for node in nodes:
+            selfdict[node[0].replace('-','_')] = self.getValue(node[0], node[1])
         self.admins = list()
         for e in self.getElements('admin'):
             self.admins.append(e.firstChild.data)
-        self.admin_password = self.getValue('admin-password',1)
-        self.auto_restart = int(self.getValue('auto-restart'))
-        self.public_log_dir = self.getValue('public-log-dir',1)
-        self.private_log_dir = self.getValue('private-log-dir',1)
         self.access = dict()
         for e in self.getElements('access'):
             pass
@@ -78,11 +74,14 @@ class Config(object):
                 del self.access[jid]
         #save access config
 
-    def getValue(self, name, parse = False):
+    def getValue(self, name, parse):
         if parse:
             return self.parse_string(self.getElements(name)[0])
-        else:
-            return self.getElements(name)[0].firstChild.data
+        value = self.getElements(name)[0].firstChild.data
+        try:
+            return int(value)
+        except ValueError:
+            return value
 
     def parse_string(self, parent):
         string = list()
