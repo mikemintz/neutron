@@ -22,10 +22,11 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-import random
-
 from os import getpid
+from random import randrange
+from sys import exit as sys_exit
 from types import InstanceType
+from xml.dom.minidom import parse as xml_parse
 
 class Config(object):
     _ref = None
@@ -45,27 +46,30 @@ class Config(object):
         #self.NICKS_CACHE_FILE = 'dynamic/chatnicks.cfg'
         #self.ACCESS_FILE = 'dynamic/access.cfg'
 
-
-        
-        fp = open(filename, 'r')
-        c = eval(fp.read())
-        fp.close()
-        self.server = c['SERVER']
-        self.port = c['PORT']
-        self.username = c['USERNAME']
-        self.password = c['PASSWORD']
-        self.resource = c['RESOURCE']
-        self.default_nick = c['DEFAULT_NICK']
-        self.admins = c['ADMINS']
-        self.admin_password = c['ADMIN_PASSWORD']
-
-        self.auto_restart = c['AUTO_RESTART']
-
-        self.public_log_dir = c['PUBLIC_LOG_DIR']
-        self.private_log_dir = c['PRIVATE_LOG_DIR']
-
-        self.access = c['ACCESS']
-        self.groupchats = c['GROUPCHATS']
+        doc = xml_parse(self.filename)
+        self.getElements = doc.documentElement.getElementsByTagName
+        self.server = self.getValue('server')
+        self.port = int(self.getValue('port'))
+        self.username = self.getValue('username')
+        self.password = self.getValue('password')
+        self.resource = self.getValue('resource',1)
+        self.default_nick = self.getValue('default-nick',1)
+        self.admins = list()
+        for e in self.getElements('admin'):
+            self.admins.append(e.firstChild.data)
+        self.admin_password = self.getValue('admin-password',1)
+        self.auto_restart = int(self.getValue('auto-restart'))
+        self.public_log_dir = self.getValue('public-log-dir',1)
+        self.private_log_dir = self.getValue('private-log-dir',1)
+        self.access = dict()
+        for e in self.getElements('access'):
+            pass
+        self.groupchats = dict()
+        for e in self.getElements('groupchat'):
+            autojoin = int(e.getAttribute('autojoin'))
+            jid = e.getElementsByTagName('jid')[0].firstChild.data
+            nick = e.getElementsByTagName('nick')[0].firstChild.data
+            self.groupchats[jid] = {'autojoin': autojoin, 'nick': nick}
 
         for jid in self.admins:
             self.change_access_perm(jid, 100)
@@ -73,6 +77,34 @@ class Config(object):
             if self.access[jid] == 0:
                 del self.access[jid]
         #save access config
+
+    def getValue(self, name, parse = False):
+        if parse:
+            return self.parse_string(self.getElements(name)[0])
+        else:
+            return self.getElements(name)[0].firstChild.data
+
+    def parse_string(self, parent):
+        string = list()
+        app = string.append
+        for node in parent.childNodes:
+            if node.nodeName == '#text':
+                app(node.data)
+            elif node.nodeName == 'pid':
+                app(str(getpid()))
+            elif node.nodeName == 'random':
+                rmin, rmax, rstep = 0, 42, 1
+                if node.hasAttribute('min'):
+                    rmin = int(node.getAttribute('min'))
+                if node.hasAttribute('max'):
+                    rmax = int(node.getAttribute('max'))
+                if node.hasAttribute('step'):
+                    rstep = int(node.getAttribute('step'))
+                app(str(randrange(rmin, rmax, rstep)))
+            else:
+                print 'ERROR: config file is corrupt'
+                sys_exit(1)
+        return ''.join(string)
 
     def change_access_temp(self, source, level=0):
         jid = self.get_true_jid(source)

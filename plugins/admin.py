@@ -22,6 +22,7 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 from os import abort, execv
+from sys import exit as sys_exit
 
 class Admin:
     def __init__(self):
@@ -85,5 +86,5 @@ class Admin:
         ##os.startfile(sys.argv[0])
         self.conn.smsg(type, source, 'Exiting')
         self.conn.disconnect()
-        abort()
+        sys_exit(0)
 

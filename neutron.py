@@ -44,7 +44,7 @@ class Neutron:
                           type='string',
                           dest='config_filename',
                           help='the pathname of the config file',
-                          metavar="PATHNAME",
+                          metavar='PATHNAME',
                           default='neutron.cfg')
         parser.add_option('-p',  '--pid-file',
                           action='store',
@@ -137,7 +137,7 @@ if __name__ == '__main__':
         pass
     except:
         print_exc()
-    print 'uptime: %s' % (str(datetime.now() - t0))
+    print 'uptime: %s' % (datetime.now() - t0)
     print 'Bye :\'('
 
 
