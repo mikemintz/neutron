@@ -103,14 +103,14 @@ class Connection(Client):
 	
         if groupchat in Config().groupchats:
             if t == 'available' or t == None:
-                if not Config().groupchats[groupchat].has_key(nick):
-                    Config().groupchats[groupchat][nick] = {'jid': prs.getFrom(), 'idle': time()}
+                if not Config().groupchats[groupchat]['participants'].has_key(nick):
+                    Config().groupchats[groupchat]['participants'][nick] = {'jid': prs.getFrom(), 'idle': time()}
                     self.call_join_handlers(groupchat, nick)
                     sleep(0.5)
             elif t == 'unavailable':
-                if Config().groupchats[groupchat].has_key(nick):
+                if Config().groupchats[groupchat]['participants'].has_key(nick):
                     self.call_part_handlers(groupchat, nick)
-                    del Config().groupchats[groupchat][nick]
+                    del Config().groupchats[groupchat]['participants'][nick]
             elif t == 'error':
                 try:
                     code = prs.asNode().getTag('error').getAttr('code')
@@ -194,7 +194,7 @@ class Connection(Client):
         elif type == 'private':
             self.msg(source[0], body)
 
-    def join(self, groupchat, nick=None, password=None):
+    def join(self, groupchat, nick=None, password=None, auto=False):
         if nick is None:
             if Config().groupchats.has_key(groupchat):
                 nick = Config().groupchats[groupchat]['nick']
@@ -205,13 +205,17 @@ class Connection(Client):
         if password:
             x.setTagData('password', password)
         self.send(p)
-        #if not Config().groupchats.has_key(groupchat):
-        Config().groupchats[groupchat] = {'autojoin': True, 'nick': nick}
+        if auto:
+            #if not Config().groupchats.has_key(groupchat):
+            Config().groupchats[groupchat] = {'autojoin': True, 'nick': nick,
+                                              'participants': dict()}
+            Config().save('groupchats')
         
     def part(self, groupchat):
         self.send(Presence(groupchat, 'unavailable'))
         if Config().groupchats.has_key(groupchat):
             Config().groupchats[groupchat]['autojoin'] = False
+            Config().save('groupchats')
 
     def get_groupchat(self, jid):
         if type(self, jid) is types.ListType:

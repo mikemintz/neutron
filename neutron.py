@@ -96,7 +96,7 @@ class Neutron:
 
     def autojoin_rooms(self):
         for groupchat in Config().groupchats.iterkeys():
-            self.conn.join(groupchat)
+            self.conn.join(groupchat, auto=True)
             #time.sleep(0.5)
 
     def load_plugins(self):

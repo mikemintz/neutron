@@ -65,14 +65,21 @@ class Config(object):
             autojoin = int(e.getAttribute('autojoin'))
             jid = e.getElementsByTagName('jid')[0].firstChild.data
             nick = e.getElementsByTagName('nick')[0].firstChild.data
-            self.groupchats[jid] = {'autojoin': autojoin, 'nick': nick}
+            self.groupchats[jid] = {'autojoin': autojoin, 'nick': nick,
+                                    'participants': dict()}
+
+        del self.getElements #GC can now erase doc
 
         for jid in self.admins:
             self.change_access_perm(jid, 100)
+            
+        need_save_config = False
         for jid in self.access.keys():
             if self.access[jid] == 0:
+                need_save_config = True
                 del self.access[jid]
-        #save access config
+        if need_save_config:
+            self.save('access')
 
     def getValue(self, name, parse):
         if parse:
@@ -104,6 +111,14 @@ class Config(object):
                 print 'ERROR: config file is corrupt'
                 sys_exit(1)
         return ''.join(string)
+
+    def save(self, element):
+        if element == 'access':
+            pass
+        elif element == 'groupchats':
+            pass
+        else:
+            pass
 
     def change_access_temp(self, source, level=0):
         jid = self.get_true_jid(source)
