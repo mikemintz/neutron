@@ -273,7 +273,7 @@ def set_nick(groupchat, nick=None):
 ################################################################################
 
 def get_access_levels():
-    global ACCESS
+	global ACCESS
 	initialize_file(ACCESS_FILE, '{}')
 	ACCESS = eval(read_file(ACCESS_FILE))
 	for jid in ADMINS:
@@ -284,7 +284,7 @@ def get_access_levels():
 	write_file(ACCESS_FILE , str(ACCESS))
 
 def change_access_temp(source, level=0):
-    global ACCESS
+	global ACCESS
 	jid = get_true_jid(source)
 	try:
 		level = int(level)
@@ -293,7 +293,7 @@ def change_access_temp(source, level=0):
 	ACCESS[jid] = level
 
 def change_access_perm(source, level=0):
-    global ACCESS
+	global ACCESS
 	jid = get_true_jid(source)
 	try:
 		level = int(level)
@@ -305,7 +305,7 @@ def change_access_perm(source, level=0):
 	ACCESS[jid] = level
 
 def user_level(source):
-    global ACCESS
+	global ACCESS
 	jid = get_true_jid(source)
 	if ACCESS.has_key(jid):
 		return ACCESS[jid]
