@@ -10,4 +10,4 @@ def handler_eliza_en(type,source, body):
 		smsg(type,source, result)
 	pass
 	
-register_message_handler(handler_eliza_en)
+#register_message_handler(handler_eliza_en)

@@ -9,7 +9,10 @@ def google_remove_html(text):
 	return noescape
 
 def google_search(query):
-	data = google.doGoogleSearch(query)
+	try:
+    	    data = google.doGoogleSearch(query)
+	except SOAP.HTTPError:
+	    return 'Google API Error.'    
 	try:
 		first = data.results[0]
 		url = first.URL
