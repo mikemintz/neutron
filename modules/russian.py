@@ -5,8 +5,15 @@ __where = [re.compile(r'<span id="r_text" name="r_text">([^<]*)')]
 class BabelizerError(Exception):
 	pass
 
+# modified by Guest007 at 29.05.2006
 class LanguageNotAvailableError(BabelizerError):
-	pass
+        def __init__(self, value):
+            self.value = value
+        def __str__(self):
+            return repr(self.value)
+#	pass
+# end of modificaton (29.05.2006)
+
 class BabelfishChangedError(BabelizerError):
 	pass
 class BabelizerIOError(BabelizerError):
@@ -22,8 +29,14 @@ def translate(phrase, from_lang, to_lang):
 		from_lang = 's'
 	if to_lang == 'es':
 		to_lang = 's'
-	if from_lang[0] not in ['e', 's', 'r', 'i', 'g', 'f'] or to_lang[0] not in ['e', 's', 'r', 'i', 'g', 'f']:
-		raise LanguageNotAvailableError(lang)
+# modified by Guest007 at 29.05.2006
+#	if from_lang[0] not in ['e', 's', 'r', 'i', 'g', 'f'] or to_lang[0] not in ['e', 's', 'r', 'i', 'g', 'f']:
+#		raise LanguageNotAvailableError(lang)
+	if from_lang[0] not in ['e', 's', 'r', 'i', 'g', 'f']:
+                raise LanguageNotAvailableError(from_lang[0])
+        elif to_lang[0] not in ['e', 's', 'r', 'i', 'g', 'f']:
+                raise LanguageNotAvailableError(to_lang[0])
+# end of modificaton (29.05.2006)
 	direction = from_lang[0] + to_lang[0]
 	phrase=phrase.encode('cp1251')
 	params = urllib.urlencode( {
