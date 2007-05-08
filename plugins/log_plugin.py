@@ -8,7 +8,8 @@ initialize_file(LOG_CACHE_FILE, '{}')
 LOG_FILENAME_CACHE = eval(read_file(LOG_CACHE_FILE))
 
 def log_write_header(fp, source, (year, month, day, hour, minute, second, weekday, yearday, daylightsavings)):
-    fp.write("""<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    body=""
+    body="""<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
@@ -30,7 +31,9 @@ h2 { color: #663399; font-family: sans-serif; letter-spacing: 2px; text-align: c
 <br />
 <tt>
 
-""")
+"""
+    body=body.encode('utf-8')
+    fp.write(body)
 
 def log_write_footer(fp):
     fp.write('\n</tt>\n</body>\n</html>')
@@ -50,16 +53,28 @@ def log_get_fp(type, source, (year, month, day, hour, minute, second, weekday, y
     if not os.path.exists(logdir):
         os.mkdir(logdir)
     if not os.path.exists(logdir + '/' + source):
-        os.mkdir(logdir + '/' + source)
+         try:
+	    os.mkdir(logdir + '/' + source)
+	 except:
+	    pass
     if not os.path.exists(logdir + '/' + source + '/' + str_year):
-        os.mkdir(logdir + '/' + source + '/' + str_year)
+	try:
+    	    os.mkdir(logdir + '/' + source + '/' + str_year)
+	except:
+	    pass
     if not os.path.exists(logdir + '/' + source + '/' + str_year + '/' + str_month):
-        os.mkdir(logdir + '/' + source + '/' + str_year + '/' + str_month)
+	try:
+    	    os.mkdir(logdir + '/' + source + '/' + str_year + '/' + str_month)
+	except:
+	    pass    
     if LOG_FILENAME_CACHE.has_key(source):
         if LOG_FILENAME_CACHE[source] != filename:
-            fp_old = file(LOG_FILENAME_CACHE[source], 'a')
-            log_write_footer(fp_old)
-            fp_old.close()
+            try:
+		fp_old = file(LOG_FILENAME_CACHE[source], 'a')
+        	log_write_footer(fp_old)
+        	fp_old.close()
+	    except:
+		pass
         if os.path.exists(filename):
             fp = file(filename, 'a')
             return fp
