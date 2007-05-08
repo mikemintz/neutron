@@ -459,6 +459,7 @@ def start():
 		print 'Logged In'
 	else:
 		print "eek -> ", JCON.lastErr, JCON.lastErrCode
+		time.sleep(10) # sleep for 10 seconds
 		sys.exit(1)
 
 	JCON.RegisterHandler('message', messageCB)
