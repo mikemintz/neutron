@@ -66,6 +66,7 @@ def handler_pyorg_get(type, source, parameters):
 	for line in message.split('\n'):
 	    if line.strip():
 		    reply += line + '\r\n'
+	reply='\n' + reply	    
 	smsg(type,source,unicode(reply,'koi8-r'))
 
 
