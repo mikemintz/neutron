@@ -45,15 +45,15 @@ class Config(object):
         self.filename = filename
         doc = xml_parse(self.filename)
         self.getElements = doc.documentElement.getElementsByTagName
-        #nodes = [('node-name', parse?),...]
-        nodes = [('server', False), ('port', False),
+        #nodes = [('node-name', parse?, type=unicode),...]
+        nodes = [('server', False), ('port', False, int),
                  ('username', False), ('password', False),
                  ('resource', True), ('default-nick', True),
                  ('admin-password', True), ('auto-restart', False),
                  ('public-log-dir', True), ('private-log-dir', True)]
         selfdict = self.__dict__
         for node in nodes:
-            selfdict[node[0].replace('-','_')] = self.getValue(node[0], node[1])
+            selfdict[node[0].replace('-','_')] = self.getValue(*node)
         self.admins = list()
         for e in self.getElements('admin'):
             self.admins.append(e.firstChild.data)
@@ -81,12 +81,12 @@ class Config(object):
         if need_save_config:
             self.save('access')
 
-    def getValue(self, name, parse):
+    def getValue(self, name, parse, typ=unicode):
         if parse:
             return self.parse_string(self.getElements(name)[0])
         value = self.getElements(name)[0].firstChild.data
         try:
-            return int(value)
+            return typ(value)
         except ValueError:
             return value
 

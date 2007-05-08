@@ -41,7 +41,7 @@ class Access:
         elif type == 'private':
             jid = self.config.get_true_jid(source)
             if parameters.strip() == self.config.admin_password:
-                change_access_temp(jid, 100)
+                self.config.change_access_temp(jid, 100)
                 self.conn.smsg(type, source, 'Access Granted')
             else:
                 self.conn.smsg(type, source, 'Access Denied')
