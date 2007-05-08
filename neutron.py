@@ -47,6 +47,7 @@ PRIVATE_LOG_DIR = GENERAL_CONFIG['PRIVATE_LOG_DIR']
 
 INITSCRIPT_FILE = GENERAL_CONFIG['INITSCRIPT_FILE']
 
+BOOTUP_TIMESTAMP = time.time()
 
 ################################################################################
 
