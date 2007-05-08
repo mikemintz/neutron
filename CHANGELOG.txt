@@ -1,6 +1,16 @@
 # Neutron - a Jabber bot in Python
 # Changelog
 
+0.5.x - 08/May/2007 - Gh0st
+	* neutron.py: Bootup timestamp
+	* yasmine_plugin.py: (new) !rooms !uptime
+	* babel_plugin.py: !enru fix (now works fine with phrases)
+	* start.py: Startup script (use killall python to kill it)
+	* log_plugin.py: critical fixes that avoid tracebacks & headers fixes.
+	* dns_plugin.py: New server type feature.
+
+
+
 0.5 - 30/Sep/2005 - Badlop
 
 	* neutron.py: New --pid command line option, writes PID to a file. (Mikem)
