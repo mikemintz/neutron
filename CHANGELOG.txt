@@ -8,6 +8,7 @@
 	* start.py: Startup script (use killall python to kill it)
 	* log_plugin.py: critical fixes that avoid tracebacks & headers fixes.
 	* dns_plugin.py: New server type feature.
+	* wcom_plugin.py: (new) weather.com plugin.
 
 
 
