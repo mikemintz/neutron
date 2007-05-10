@@ -1,4 +1,4 @@
-<!ELEMENT neutron-conf (server,port,username,password,resource,default-nick,admin*,admin-password,auto-restart,public-log-dir,private-log-dir,access*,groupchat*)>
+<!ELEMENT neutron-conf (server,port,username,password,resource,default-nick,admin*,admin-password,auto-restart,system-log-filename,system-log-format,system-log-datefmt,system-log-level,public-log-dir,private-log-dir,access*,groupchat*)>
 <!ELEMENT server (#PCDATA)>
 <!ELEMENT port (#PCDATA)>
 <!ELEMENT username (#PCDATA)>
@@ -8,6 +8,10 @@
 <!ELEMENT admin (#PCDATA)>
 <!ELEMENT admin-password (#PCDATA|pid|random)*>
 <!ELEMENT auto-restart (#PCDATA)>
+<!ELEMENT system-log-filename (#PCDATA)>
+<!ELEMENT system-log-format (#PCDATA)>
+<!ELEMENT system-log-datefmt (#PCDATA)>
+<!ELEMENT system-log-level (#PCDATA)>
 <!ELEMENT public-log-dir (#PCDATA|pid|random)*>
 <!ELEMENT private-log-dir (#PCDATA|pid|random)*>
 <!ELEMENT access EMPTY>

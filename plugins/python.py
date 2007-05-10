@@ -27,7 +27,7 @@ from sys import exc_info
 class Python:
     def __init__(self):
         self.neutron_version = ('0.5.42')
-        self.version = "2.0"
+        self.version = '2.0'
         self.name = 'Python'
         self.description = ''
         self.homepageurl = 'http://ejabberd.jabber.ru/neutron'

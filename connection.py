@@ -24,6 +24,7 @@
 
 import thread
 
+from logging import getLogger
 from os import execl, name as os_name
 from string import split
 from sys import argv, exit as sys_exit, executable as sys_executable
@@ -50,6 +51,7 @@ class Connection(Client):
         self.presence_handlers = []
         self.groupchat_invite_handlers = []
         self.command_handlers = {}
+        self.logger = getLogger('connection')
 
     def connect(self):
         if Client.connect(self):
@@ -131,11 +133,11 @@ class Connection(Client):
         self.call_iq_handlers(iq)
 
     def DisconnectHandler(self):
-        print 'DISCONNECTED'
+        self.logger.info('disconnected')
         if Config().auto_restart:
-            print 'WAITING FOR RESTART...'
+            self.logger.info('waiting for restart...')
             sleep(240) # sleep for 240 seconds
-            print 'RESTARTING'
+            self.logger.info('restarting')
             execl(sys_executable, sys_executable, argv[0])
         else:
             sys_exit(0)
@@ -164,7 +166,7 @@ class Connection(Client):
 
     def call_presence_handlers(self, prs):
         for handler in self.presence_handlers:
-            thread.start_new(handler, (self, prs,))
+            thread.start_new(handler, (prs,))
 
     def call_groupchat_invite_handlers(self, source, groupchat, body):
         for handler in self.groupchat_invite_handlers:

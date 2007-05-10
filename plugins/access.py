@@ -24,7 +24,7 @@
 class Access:
     def __init__(self):
         self.neutron_version = ('0.5.42')
-        self.version = "2.0"
+        self.version = '2.0'
         self.name = 'Access'
         self.description = 'Allow to control Neutron access'
         self.homepageurl = 'http://ejabberd.jabber.ru/neutron'

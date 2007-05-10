@@ -50,6 +50,8 @@ class Config(object):
                  ('username', False), ('password', False),
                  ('resource', True), ('default-nick', True),
                  ('admin-password', True), ('auto-restart', False),
+                 ('system-log-filename', False), ('system-log-format', False),
+                 ('system-log-datefmt', False), ('system-log-level', False),
                  ('public-log-dir', True), ('private-log-dir', True)]
         selfdict = self.__dict__
         for node in nodes:

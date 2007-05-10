@@ -27,7 +27,7 @@ from sys import exit as sys_exit
 class Admin:
     def __init__(self):
         self.neutron_version = ('0.5.42')
-        self.version = "2.0"
+        self.version = '2.0'
         self.name = 'Admin'
         self.description = 'Allow to control Neutron'
         self.homepageurl = 'http://ejabberd.jabber.ru/neutron'

@@ -31,7 +31,7 @@ from time import localtime, strftime, time
 class Log:
     def __init__(self):
 	self.neutron_version = ('0.5.42')
-	self.version = "2.0"
+	self.version = '2.0'
 	self.name = 'Log'
 	self.description = 'Log conversations'
 	self.homepageurl = 'http://ejabberd.jabber.ru/neutron'

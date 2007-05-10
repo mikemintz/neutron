@@ -23,6 +23,11 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 from datetime import datetime
+from logging import (basicConfig, getLogger, info as log_info,
+                     error as log_error, warning as log_warning)
+from logging import (CRITICAL as log_CRITICAL, DEBUG as log_DEBUG,
+                     ERROR as log_ERROR, INFO as log_INFO,
+                     WARNING as log_WARNING)
 from optparse import OptionParser
 from os import access, getcwd, getpid, listdir
 from os import F_OK, R_OK, W_OK
@@ -60,18 +65,25 @@ class Neutron:
             fp.write(str(getpid()))
             fp.close()
         except(IOError):
-            print 'ERROR: pid-file "%s" is not accessible' % \
-                  (self.options.config_filename)
+            log_error('pid-file "%s" is not accessible' % \
+                      (self.options.config_filename))
             sys_exit(1)
         try:
             self.config = Config(self.options.config_filename)
         except(IOError):
-            print 'ERROR: config-file "%s" is not accessible' % \
-                  (self.options.config_filename)
+            log_error('config-file "%s" is not accessible' % \
+                      (self.options.config_filename))
             sys_exit(1)
+        basicConfig(filename=self.config.system_log_filename,
+                    #stream=stdout,
+                    format=self.config.system_log_format,
+                    datefmt=self.config.system_log_datefmt,
+                    level=globals()['log_%s' %
+                                    self.config.system_log_level])
         self.conn = Connection()
         self.loaded_sysplugins = []
         self.loaded_plugins = []
+        log_info('starting')
 
     def __del__(self):
         if(self.__dict__.has_key('options') and self.options.pid_filename):
@@ -80,16 +92,17 @@ class Neutron:
 
     def connect(self):
         if self.conn.connect():
-            print 'Connected'
+            self.conn.logger.info('Connected')
         else:
-            print 'ERROR: Couldn\'t connect'
+            log_error('Couldn\'t connect')
             sys_exit(1)
         if self.conn.auth(self.config.username,
                           self.config.password,
                           self.config.resource):
-            print 'Logged In'
+            self.conn.logger.info('Logged In')
         else:
-            print 'ERROR: %s %s' % (self.conn.lastErrCode, self.conn.lastErr)
+            self.conn.logger.error('%s %s' % (self.conn.lastErrCode,
+                                              self.conn.lastErr))
             sys_exit(1)
         self.conn.sendInitPresence()
 
@@ -111,11 +124,12 @@ class Neutron:
                                   plugin_name.capitalize())
                     obj = Plugin().Plugin(cls, self.conn)
                     self.loaded_plugins.append(obj) 
-                    print 'plugin %s v%s loaded' % (obj.name, obj.version)
+                    Plugin.logger.info('plugin %s v%s loaded' % (obj.name,
+                                                                 obj.version))
                     plug = None
                 except:
-                    print 'WARNING: Coulndn\'t load plugin "%s"' % (plugin)
-                    print '>>%s: %s' % (exc_info()[0].__name__, exc_info()[1])
+                    Plugin.logger.warning('Coulndn\'t load plugin "%s"\n>>%s: %s' %
+                               (plugin, exc_info()[0].__name__, exc_info()[1]))
 
     def loop(self):
         while 1:
@@ -132,12 +146,13 @@ if __name__ == '__main__':
         neutron.autojoin_rooms()
         neutron.loop()
     except KeyboardInterrupt:
-        print 'Keyboard Interrupt'
+        log_info('Keyboard Interrupt')
     except SystemExit:
         pass
     except:
         print_exc()
     print 'uptime: %s' % (datetime.now() - t0)
     print 'Bye :\'('
+    log_info('finishing')
 
 

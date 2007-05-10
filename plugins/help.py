@@ -24,7 +24,7 @@
 class Help:
     def __init__(self):
 	self.neutron_version = ('0.5.42')
-	self.version = "2.0"
+	self.version = '2.0'
 	self.name = 'Help'
 	self.description = 'Some help about Neutron\'s commands'
 	self.homepageurl = 'http://ejabberd.jabber.ru/neutron'

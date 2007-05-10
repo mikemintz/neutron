@@ -23,9 +23,12 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 from config import Config
+from logging import getLogger
 from os import access, F_OK
 
 class Plugin:
+    logger = getLogger('plugin')
+    
     def __init__(self):
         pass
 
@@ -35,10 +38,11 @@ class Plugin:
         cls.initialize_file = self.initialize_file
         cls.read_file = self.read_file
         cls.write_file = self.write_file
+        cls.logger = getLogger('plugin.%s' % str(cls).split('.')[1])
         obj = cls()
         if obj.__dict__.has_key(self.__class__.__name__):
-            print 'ERROR: Plugin %s v%s already plugged' % \
-                  (obj.name, obj.version)
+            Plugin.logger.error('Plugin %s v%s already plugged' % \
+                                (obj.name, obj.version))
             raise
         obj.__dict__[self.__class__.__name__] = self
         for key in ('description', 'homepageurl', 'updateurl'):
@@ -55,7 +59,7 @@ class Plugin:
             if obj.__dict__.has_key(key) and obj.__dict__[key]:
                 for handler in obj.__dict__[key]:
                     if handler.func_code.co_argcount != nb_args:
-                        print 'ERROR: Plugin %s v%s : handler %s doesn\'t have %s arguments !' % (obj.name, obj.version, handler.func_code.co_name, nb_args)
+                        Plugin.logger.error('Plugin %s v%s : handler %s doesn\'t have %s arguments !' % (obj.name, obj.version, handler.func_code.co_name, nb_args))
                         raise
                 conn.__dict__[key].extend(obj.__dict__[key])
         if obj.__dict__.has_key('command_handlers') and \
@@ -63,7 +67,7 @@ class Plugin:
             for handler, command, access, description, syntax, examples in \
                     obj.__dict__['command_handlers']:
                 if handler.func_code.co_argcount != 4:
-                    print 'ERROR: Plugin %s v%s : handler %s doesn\'t have 4 arguments !' % (obj.name, obj.version, handler.func_code.co_name)
+                    Plugin.logger.error('Plugin %s v%s : handler %s doesn\'t have 4 arguments !' % (obj.name, obj.version, handler.func_code.co_name))
                     raise
                 conn.__dict__['command_handlers'][command] = {
                     'handler' : handler,
