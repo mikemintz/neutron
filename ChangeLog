@@ -15,6 +15,7 @@
     * plugin Log create valid "XHTML 1.0 strict" pages!
     * plugin Log: addition of a html link on each timestamp
     * config file is now in xml \o/
+    * system logging facility
     * a lot of optimizations
 
 
