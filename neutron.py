@@ -23,15 +23,13 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 from datetime import datetime
-from logging import (basicConfig, getLogger, info as log_info,
-                     error as log_error, warning as log_warning)
+from logging import (basicConfig, info as log_info, error as log_error,
+                     warning as log_warning)
 from logging import (CRITICAL as log_CRITICAL, DEBUG as log_DEBUG,
                      ERROR as log_ERROR, INFO as log_INFO,
                      WARNING as log_WARNING)
 from optparse import OptionParser
-from os import access, getcwd, getpid, listdir
-from os import F_OK, R_OK, W_OK
-from os.path import join as path_join
+from os import getpid, listdir
 from sys import exc_info, exit as sys_exit, path
 from traceback import print_exc
 
@@ -58,12 +56,12 @@ class Neutron:
                           help='the pathname of the process ID file',
                           metavar='PATHNAME',
                           default='neutron.pid')
-        (self.options, args) = parser.parse_args()
+        (self.options, _) = parser.parse_args()
 
         try:
-            fp = open(self.options.pid_filename, 'w')
-            fp.write(str(getpid()))
-            fp.close()
+            file_ = open(self.options.pid_filename, 'w')
+            file_.write(str(getpid()))
+            file_.close()
         except(IOError):
             log_error('pid-file "%s" is not accessible' % \
                       (self.options.config_filename))
@@ -122,14 +120,15 @@ class Neutron:
                     plug = __import__(''.join(['plugins.', plugin_name]))
                     cls = getattr(getattr(plug, plugin_name),
                                   plugin_name.capitalize())
-                    obj = Plugin().Plugin(cls, self.conn)
+                    obj = Plugin().plugin(cls, self.conn)
                     self.loaded_plugins.append(obj) 
                     Plugin.logger.info('plugin %s v%s loaded' % (obj.name,
                                                                  obj.version))
                     plug = None
                 except:
-                    Plugin.logger.warning('Coulndn\'t load plugin "%s"\n>>%s: %s' %
-                               (plugin, exc_info()[0].__name__, exc_info()[1]))
+                    Plugin.logger.warning('Coulndn\'t load plugin "%s" >>%s: %s'
+                                          % (plugin, exc_info()[0].__name__,
+                                             exc_info()[1]))
 
     def loop(self):
         while 1:
@@ -138,20 +137,20 @@ class Neutron:
         
 #-----------------------------------------------------------------------------
 if __name__ == '__main__':
-    t0 = datetime.now()
+    START_TIME = datetime.now()
     try:
-        neutron = Neutron()
-        neutron.load_plugins()
-        neutron.connect()
-        neutron.autojoin_rooms()
-        neutron.loop()
+        NEUTRON = Neutron()
+        NEUTRON.load_plugins()
+        NEUTRON.connect()
+        NEUTRON.autojoin_rooms()
+        NEUTRON.loop()
     except KeyboardInterrupt:
         log_info('Keyboard Interrupt')
     except SystemExit:
         pass
     except:
         print_exc()
-    print 'uptime: %s' % (datetime.now() - t0)
+    print 'uptime: %s' % (datetime.now() - START_TIME)
     print 'Bye :\'('
     log_info('finishing')
 

@@ -26,7 +26,6 @@ import thread
 
 from logging import getLogger
 from os import execl, name as os_name
-from string import split
 from sys import argv, exit as sys_exit, executable as sys_executable
 from time import sleep, time
 from xmpp import Client, Iq, JID, Message, Presence
@@ -55,14 +54,14 @@ class Connection(Client):
 
     def connect(self):
         if Client.connect(self):
-            self.RegisterHandler('message', self.MessageHandler)
-            self.RegisterHandler('presence', self.PresenceHandler)
-            self.RegisterHandler('iq', self.IqHandler)
-            self.RegisterDisconnectHandler(self.DisconnectHandler)
+            self.RegisterHandler('message', self.message_handler)
+            self.RegisterHandler('presence', self.presence_handler)
+            self.RegisterHandler('iq', self.iq_handler)
+            self.RegisterDisconnectHandler(self.disconnect_handler)
             return True
         return False
 
-    def MessageHandler(self, con, msg):
+    def message_handler(self, con, msg):
         #print unicode(msg)
         for x_node in msg.getTags('x', {}, NS_MUC_USER):
             decline = msg.getTag('decline')
@@ -124,26 +123,26 @@ class Connection(Client):
                 parameters = body[(body.find(' ') + 1):]
         if not msg.timestamp:
             if msgtype == 'groupchat':
-                t = 'public'
+                type_ = 'public'
             else:
-                t = 'private'
-            self.call_message_handlers(t, [fromjid, fromjid.getStripped(),
-                                           fromjid.getResource()], body)
+                type_ = 'private'
+            self.call_message_handlers(type_, [fromjid, fromjid.getStripped(),
+                                               fromjid.getResource()], body)
             if command in self.command_handlers.keys():
-                self.call_command_handlers(command, t, [fromjid,
-                                                        fromjid.getStripped(),
-                                                        fromjid.getResource()],
+                self.call_command_handlers(command, type_,
+                                           [fromjid, fromjid.getStripped(),
+                                            fromjid.getResource()],
                                            parameters)
 
-    def PresenceHandler(self, con, prs):
+    def presence_handler(self, con, prs):
         #print unicode(prs)
         self.call_presence_handlers(prs)
-        t = prs.getType()
+        type_ = prs.getType()
         groupchat = prs.getFrom().getStripped()
         nick = prs.getFrom().getResource()
 	
         if groupchat in Config().groupchats:
-            if t == 'available' or t == None:
+            if type_ == 'available' or type_ == None:
                 if not Config().groupchats[groupchat]['participants'].has_key(nick):
                     jid = prs.getJid()
                     if jid:
@@ -153,11 +152,11 @@ class Connection(Client):
                     Config().groupchats[groupchat]['participants'][nick] = {'jid': jid, 'idle': time()}
                     self.call_join_handlers(groupchat, nick)
                     sleep(0.5)
-            elif t == 'unavailable':
+            elif type_ == 'unavailable':
                 if Config().groupchats[groupchat]['participants'].has_key(nick):
                     self.call_part_handlers(groupchat, nick)
                     del Config().groupchats[groupchat]['participants'][nick]
-            elif t == 'error':
+            elif type_ == 'error':
                 try:
                     code = prs.asNode().getTag('error').getAttr('code')
                 except:
@@ -166,19 +165,20 @@ class Connection(Client):
                     self.join(groupchat, nick + '_')
                     sleep(0.5)
 
-    def IqHandler(self, con, iq):
-        if iq.getTags('query', {}, NS_VERSION):
-            result = iq.buildReply('result')
+    def iq_handler(self, con, iq_):
+        if iq_.getTags('query', {}, NS_VERSION):
+            result = iq_.buildReply('result')
             query = result.getTag('query')
             query.setTagData('name', 'Neutron')
             query.setTagData('version', '0.5.42')
             query.setTagData('os', os_name)
             self.send(result)
-        self.call_iq_handlers(iq)
+        self.call_iq_handlers(iq_)
 
-    def DisconnectHandler(self):
+    def disconnect_handler(self):
         self.logger.info('disconnected')
-        if Config().auto_restart:
+        config = Config()
+        if not config.halt and config.auto_restart:
             self.logger.info('waiting for restart...')
             sleep(240) # sleep for 240 seconds
             self.logger.info('restarting')
@@ -186,9 +186,9 @@ class Connection(Client):
         else:
             sys_exit(0)
 
-    def call_message_handlers(self, type, source, body):
+    def call_message_handlers(self, type_, source, body):
         for handler in self.message_handlers:
-            thread.start_new(handler, (type, source, body))
+            thread.start_new(handler, (type_, source, body))
 
     def call_outgoing_message_handlers(self, target, body):
         for handler in self.outgoing_message_handlers:
@@ -202,13 +202,13 @@ class Connection(Client):
         for handler in self.part_handlers:
             thread.start_new(handler, (groupchat, nick))
 
-    def call_iq_handlers(self, iq):
+    def call_iq_handlers(self, iq_):
         for handler in self.iq_handlers:
-            thread.start_new(handler, (iq,))
+            thread.start_new(handler, (iq_,))
 
-    def call_presence_handlers(self, prs):
+    def call_presence_handlers(self, presence):
         for handler in self.presence_handlers:
-            thread.start_new(handler, (prs,))
+            thread.start_new(handler, (presence,))
 
     def call_groupchat_invite_handlers(self, source, groupchat, subject, body,
                                        reason, password):
@@ -224,12 +224,14 @@ class Connection(Client):
         for handler in self.groupchat_config_handlers:
             thread.start_new(handler, (groupchat, element, new_value))
 
-    def call_command_handlers(self, command, type, source, parameters):
+    def call_command_handlers(self, command, type_, source, parameters):
         if self.command_handlers.has_key(command):
-            if Config().has_access(source, self.command_handlers[command]['access']):
-                thread.start_new(self.command_handlers[command]['handler'], (type, source, parameters))
+            if Config().has_access(source,
+                                   self.command_handlers[command]['access']):
+                thread.start_new(self.command_handlers[command]['handler'],
+                                 (type_, source, parameters))
             else:
-                self.smsg(type, source, 'Unauthorized')
+                self.smsg(type_, source, 'Unauthorized')
         
     def msg(self, target, body):
         msg = Message(target, body)
@@ -240,10 +242,10 @@ class Connection(Client):
         self.send(msg)
         self.call_outgoing_message_handlers(target, body)
 
-    def smsg(self, type, source, body):
-        if type == 'public':
+    def smsg(self, type_, source, body):
+        if type_ == 'public':
             self.msg(source[1], source[2] + ': ' + body)
-        elif type == 'private':
+        elif type_ == 'private':
             self.msg(source[0], body)
 
     def join(self, groupchat, nick=None, password=None, auto=False):
@@ -252,11 +254,11 @@ class Connection(Client):
                 nick = Config().groupchats[groupchat]['nick']
             else:
                 nick = Config().default_nick
-        p = Presence(groupchat + '/' + nick)
-        x = p.setTag('x', namespace=NS_MUC)
+        presence = Presence(groupchat + '/' + nick)
+        x_node = presence.setTag('x', namespace=NS_MUC)
         if password:
-            x.setTagData('password', password)
-        self.send(p)
+            x_node.setTagData('password', password)
+        self.send(presence)
         Config().groupchats[groupchat] = {'autojoin': auto, 'nick': nick,
                                           'participants': dict()}
         Config().save('groupchats')
@@ -268,11 +270,13 @@ class Connection(Client):
             Config().save('groupchats')
 
     def get_groupchat(self, jid):
-        if type(self, jid) is types.ListType:
+        if isinstance(jid, list):
             jid = jid[1]
-        jid = unicode(jid).split('/')[0] # str(jid)
+        if not isinstance(jid, JID):
+            jid = JID(jid)
+        jid = jid.getStripped()
         if Config().groupchats.has_key(jid):
-            return jid
+            return JID(jid)
         else:
             return None
 

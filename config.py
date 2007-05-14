@@ -25,69 +25,69 @@
 from os import getpid
 from random import randrange
 from sys import exit as sys_exit
-from types import InstanceType
 from xml.dom.minidom import parse as xml_parse
 from xmpp import JID
 
 class Config(object):
-    _ref = None
-    _ref2 = None
+    ref = None
+    ref2 = None
 
     def __new__(cls, *args, **kw):
-        if cls._ref is None:
-            cls._ref = super(Config, cls).__new__(cls, *args, **kw)
-        return cls._ref
+        if cls.ref is None:
+            cls.ref = super(Config, cls).__new__(cls, *args, **kw)
+        return cls.ref
     
     def __init__(self, filename = 'config.txt'):
-        if Config._ref2 is None:
-            Config._ref2 = 42
-        else:
-            return
-        self.filename = filename
-        doc = xml_parse(self.filename)
-        self.getElements = doc.documentElement.getElementsByTagName
-        #nodes = [('node-name', parse?, type=unicode),...]
-        nodes = [('server', False), ('port', False, int),
-                 ('username', False), ('password', False),
-                 ('resource', True), ('default-nick', True),
-                 ('admin-password', True), ('auto-restart', False),
-                 ('system-log-filename', False), ('system-log-format', False),
-                 ('system-log-datefmt', False), ('system-log-level', False),
-                 ('public-log-dir', True), ('private-log-dir', True)]
-        selfdict = self.__dict__
-        for node in nodes:
-            selfdict[node[0].replace('-','_')] = self.getValue(*node)
-        self.admins = list()
-        for e in self.getElements('admin'):
-            self.admins.append(e.firstChild.data)
-        self.access = dict()
-        for e in self.getElements('access'):
-            pass
-        self.groupchats = dict()
-        for e in self.getElements('groupchat'):
-            autojoin = int(e.getAttribute('autojoin'))
-            jid = e.getElementsByTagName('jid')[0].firstChild.data
-            nick = e.getElementsByTagName('nick')[0].firstChild.data
-            self.groupchats[jid] = {'autojoin': autojoin, 'nick': nick,
-                                    'participants': dict()}
+        if Config.ref2 is None:
+            Config.ref2 = 42
+            self.filename = filename
+            doc = xml_parse(self.filename)
+            self.get_elements = doc.documentElement.getElementsByTagName
+            #nodes = [('node-name', parse?, type=unicode),...]
+            nodes = [('server', False), ('port', False, int),
+                     ('username', False), ('password', False),
+                     ('resource', True), ('default-nick', True),
+                     ('admin-password', True), ('auto-restart', False),
+                     ('system-log-filename', False),
+                     ('system-log-format', False),
+                     ('system-log-datefmt', False),
+                     ('system-log-level', False),
+                     ('public-log-dir', True), ('private-log-dir', True)]
+            selfdict = self.__dict__
+            for node in nodes:
+                selfdict[node[0].replace('-','_')] = self.get_value(*node)
+            self.admins = list()
+            for e in self.get_elements('admin'):
+                self.admins.append(e.firstChild.data)
+            self.access = dict()
+            for e in self.get_elements('access'):
+                pass
+            self.groupchats = dict()
+            for e in self.get_elements('groupchat'):
+                autojoin = int(e.getAttribute('autojoin'))
+                jid = e.getElementsByTagName('jid')[0].firstChild.data
+                nick = e.getElementsByTagName('nick')[0].firstChild.data
+                self.groupchats[jid] = {'autojoin': autojoin, 'nick': nick,
+                                        'participants': dict()}
 
-        del self.getElements #GC can now erase doc
+            del self.get_elements #GC can now erase doc
 
-        for jid in self.admins:
-            self.change_access_perm(jid, 100)
+            for jid in self.admins:
+                self.change_access_perm(jid, 100)
             
-        need_save_config = False
-        for jid in self.access.keys():
-            if self.access[jid] == 0:
-                need_save_config = True
-                del self.access[jid]
-        if need_save_config:
-            self.save('access')
+            need_save_config = False
+            for jid in self.access.keys():
+                if self.access[jid] == 0:
+                    need_save_config = True
+                    del self.access[jid]
+            if need_save_config:
+                self.save('access')
+            self.halt = False
 
-    def getValue(self, name, parse, typ=unicode):
+    def get_value(self, name, parse, typ=unicode):
         if parse:
-            return self.parse_string(self.getElements(name)[0])
-        value = self.getElements(name)[0].firstChild.data
+            return self.parse_string(self.get_elements(name)[0])
+        value = self.get_elements(name)[0].firstChild.data
         try:
             return typ(value)
         except ValueError:
@@ -127,7 +127,9 @@ class Config(object):
         jid = self.get_true_jid(source)
         try:
             level = int(level)
-        except:
+        except TypeError:
+            level = 0
+        except ValueError:
             level = 0
         self.access[jid] = level
 
@@ -135,7 +137,9 @@ class Config(object):
         jid = self.get_true_jid(source)
         try:
             level = int(level)
-        except:
+        except TypeError:
+            level = 0
+        except ValueError:
             level = 0
         #temp_access = eval(read_file(ACCESS_FILE))
         #temp_access[jid] = level
@@ -159,7 +163,7 @@ class Config(object):
         true_jid = ''
         if isinstance(jid, list):
             jid = jid[0]
-        if not isinstance(jid, InstanceType):
+        if not isinstance(jid, JID):
             jid = JID(jid)
         stripped_jid = jid.getStripped()
         resource = jid.getResource()
@@ -174,7 +178,7 @@ class Config(object):
         admin_list = self.admins
         if isinstance(jid, list):
             jid = jid[0]
-        if not isinstance(jid, InstanceType):
+        if not isinstance(jid, JID):
             jid = JID(jid)
         stripped_jid = jid.getStripped()
         resource = jid.getResource()

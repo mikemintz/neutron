@@ -24,7 +24,7 @@
 
 from config import Config
 from logging import getLogger
-from os import access, F_OK
+from os import access as os_access, F_OK
 
 class Plugin:
     logger = getLogger('plugin')
@@ -32,7 +32,7 @@ class Plugin:
     def __init__(self):
         pass
 
-    def Plugin(self, cls, conn):
+    def plugin(self, cls, conn):
         cls.conn = conn
         cls.config = Config()
         cls.initialize_file = self.initialize_file
@@ -69,7 +69,9 @@ class Plugin:
             for handler, command, access, description, syntax, examples in \
                     obj.__dict__['command_handlers']:
                 if handler.func_code.co_argcount != 4:
-                    Plugin.logger.error('Plugin %s v%s : handler %s doesn\'t have 4 arguments !' % (obj.name, obj.version, handler.func_code.co_name))
+                    Plugin.logger.error(
+                        'Plugin %s v%s : handler %s doesn\'t have 4 arguments !'
+                        % (obj.name, obj.version, handler.func_code.co_name))
                     raise
                 conn.__dict__['command_handlers'][command] = {
                     'handler' : handler,
@@ -80,20 +82,20 @@ class Plugin:
         return obj
 
     def initialize_file(self, filename, data=''):
-        if not access(filename, F_OK):
-            fp = file(filename, 'w')
+        if not os_access(filename, F_OK):
+            file_ = file(filename, 'w')
             if data:
-                fp.write(data)
-            fp.close()
+                file_.write(data)
+            file_.close()
 
     def read_file(self, filename):
-        fp = file(filename)
-        data = fp.read()
-        fp.close
+        file_ = file(filename)
+        data = file_.read()
+        file_.close
         return data
 
     def write_file(self, filename, data):
-        fp = file(filename, 'w')
-        fp.write(data)
-        fp.close()
+        file_ = file(filename, 'w')
+        file_.write(data)
+        file_.close()
 

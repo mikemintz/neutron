@@ -86,6 +86,7 @@ class Admin:
     def handler_admin_exit(self, type, source, parameters):
         ##os.startfile(sys.argv[0])
         self.conn.smsg(type, source, 'Exiting')
+        self.config.halt = True
         self.conn.disconnect()
         sys_exit(0)
 
