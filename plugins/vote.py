@@ -37,12 +37,16 @@ class Vote:
         self.current_poll = {}
 
     def handler_vote_vote(self, type, source, parameters):
-        if self.config.groupchats.has_key(source[1]) and self.config.groupchats[source[1]].has_key(source[2]):
-	    if self.current_poll:
-		if self.config.isadmin(self.config.groupchats[source[1]][source[2]]['jid']) or not self.config.groupchats[source[1]][source[2]]['jid'] in self.current_poll['jids']:
+        groupchats = self.config.groupchats
+        if (groupchats.has_key(source[1]) and
+            groupchats[source[1]]['participants'].has_key(source[2])):
+            if self.current_poll:
+                if (self.config.is_admin(groupchats[source[1]]['participants'][source[2]]['jid'])
+                   or (not (groupchats[source[1]]['participants'][source[2]]['jid']
+                       in self.current_poll['jids']))):
                     if self.current_poll['options'].has_key(parameters.strip().lower()):
                         self.current_poll['options'][parameters.strip().lower()] += 1
-                        self.current_poll['jids'].append(self.config.groupchats[source[1]][source[2]]['jid'])
+                        self.current_poll['jids'].append(self.config.groupchats[source[1]]['participants'][source[2]]['jid'])
                         self.conn.smsg(type, source, 'Vote Counted')
                     else:
                         self.conn.smsg(type, source, 'Option Not Available')
@@ -50,7 +54,7 @@ class Vote:
                     self.conn.smsg(type, source, 'You already voted.')
             else:
                 self.conn.smsg(type, source, 'There\'s no poll going on right now.')
-	else:
+        else:
             self.conn.smsg(type, source, 'You must vote from the groupchat.')
 
     def handler_vote_newpoll(self, type, source, parameters):

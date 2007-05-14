@@ -27,6 +27,7 @@ from random import randrange
 from sys import exit as sys_exit
 from types import InstanceType
 from xml.dom.minidom import parse as xml_parse
+from xmpp import JID
 
 class Config(object):
     _ref = None
@@ -158,33 +159,29 @@ class Config(object):
         true_jid = ''
         if isinstance(jid, list):
             jid = jid[0]
-        if isinstance(jid, InstanceType):
-            jid = unicode(jid) # str(jid)
-        split_jid = jid.split('/', 1)
-        stripped_jid = split_jid[0]
-        resource = ''
-        if len(split_jid) == 2:
-            resource = split_jid[1]
+        if not isinstance(jid, InstanceType):
+            jid = JID(jid)
+        stripped_jid = jid.getStripped()
+        resource = jid.getResource()
         if (self.groupchats.has_key(stripped_jid) and
-            self.groupchats[stripped_jid].has_key(resource)):
-            true_jid = unicode(self.groupchats[stripped_jid][resource]['jid']).split('/', 1)[0]
+            self.groupchats[stripped_jid]['participants'].has_key(resource)):
+            true_jid = self.groupchats[stripped_jid]['participants'][resource]['jid'].getStripped()
         else:
             true_jid = stripped_jid
         return true_jid
 
     def is_admin(self, jid):
         admin_list = self.admins
-        if type(jid) is types.ListType:
+        if isinstance(jid, list):
             jid = jid[0]
-        jid = str(jid)
-        stripped_jid = jid.split('/', 1)[0]
-        resource = ''
-        if len(jid.split('/', 1)) == 2:
-            resource = jid.split('/', 1)[1]
+        if not isinstance(jid, InstanceType):
+            jid = JID(jid)
+        stripped_jid = jid.getStripped()
+        resource = jid.getResource()
         if stripped_jid in admin_list:
             return 1
         elif self.groupchats.has_key(stripped_jid):
             if self.groupchats[stripped_jid].has_key(resource):
-                if self.groupchats[stripped_jid][resource]['jid'].split('/', 1)[0] in admin_list:
+                if self.groupchats[stripped_jid]['participants'][resource]['jid'].getStripped() in admin_list:
                     return 1
         return 0

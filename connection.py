@@ -34,14 +34,12 @@ from xmpp import NS_CLIENT, NS_MUC, NS_MUC_USER, NS_VERSION
 
 from config import Config
 
-NS_CONFERENCE = 'jabber:x:conference' #because xmpppy don't have this
-
 class Connection(Client):
     def __init__(self):
         self.Namespace = NS_CLIENT
         self.DBG = 'client'
-        Client.__init__(self, server = Config().server,
-                        port = Config().port,
+        Client.__init__(self, server=Config().server,
+                        port=Config().port,
                         debug=[])
         self.message_handlers = []
         self.outgoing_message_handlers = []
@@ -50,6 +48,8 @@ class Connection(Client):
         self.iq_handlers = []
         self.presence_handlers = []
         self.groupchat_invite_handlers = []
+        self.groupchat_decline_handlers = []
+        self.groupchat_config_handlers = []
         self.command_handlers = {}
         self.logger = getLogger('connection')
 
@@ -63,9 +63,58 @@ class Connection(Client):
         return False
 
     def MessageHandler(self, con, msg):
-        #print msg
+        #print unicode(msg)
+        for x_node in msg.getTags('x', {}, NS_MUC_USER):
+            decline = msg.getTag('decline')
+            if decline:
+                reason = decline.getTagData('reason')
+                decliner_jid = JID(decline.getAttr('from'))
+                if decliner_jid:
+                    self.call_groupchat_decline_handlers(
+                        [decliner_jid, decliner_jid.getStripped(),
+                         decliner_jid.getResource()], msg.getAttr('from'),
+                        reason)
+                else: #is it possible ?
+                    self.call_groupchat_decline_handlers([None, None, None],
+                                                         x_node.getAttr('jid'),
+                                                         reason)
+                return
+            invite = msg.getTag('invite')
+            if invite:
+                reason = invite.getTagData('reason')
+                groupchat = JID(msg.getFrom())
+                inviter_jid = JID(invite.getFrom())
+                body = msg.getBody()
+                password = x_node.getTagData('password')
+                subject = msg.getSubject()
+                self.call_groupchat_invite_handlers(
+                    [inviter_jid, inviter_jid.getStripped(),
+                     inviter_jid.getResource()], groupchat, subject, body,
+                    reason, password)
+                return
+            statutes = x_node.getTags('status')
+            if statutes:
+                for status in statutes:
+                    code = status.getAttr('code')
+                    if code == 170:
+                        element, new_value = 'logging', 'enabled'
+                    elif code == 171:
+                        element, new_value = 'logging', 'disabled'
+                    elif code == 172:
+                        element, new_value = 'room', 'non-anonymous'
+                    elif code == 173:
+                        element, new_value = 'room', 'semi-anonymous'
+                    elif code == 174: #NOT RECOMMENDED by XEP-0045
+                        element, new_value = 'room', 'fully-anonymous'
+                    groupchat = JID(msg.getFrom())
+                    self.call_groupchat_config_handlers(groupchat, element,
+                                                        new_value)
+                return
         msgtype = msg.getType()
-        body = msg.getBody().strip()
+        body = msg.getBody()
+        if not body or not body.strip():
+            return
+        body = body.strip()
         fromjid = msg.getFrom()
         command = ''
         parameters = ''
@@ -85,19 +134,9 @@ class Connection(Client):
                                                         fromjid.getStripped(),
                                                         fromjid.getResource()],
                                            parameters)
-        for x_node in msg.getTags('x', {}, NS_CONFERENCE):
-            inviter_jid = None
-            muc_inviter_tag = msg.getTag('x', {}, NS_MUC_USER)
-            try:
-                inviter_jid = JID(muc_inviter_tag.getTag('invite').getAttr('from'))
-            except:
-                pass
-            if not inviter_jid:
-                inviter_jid = fromjid
-            self.call_groupchat_invite_handlers([inviter_jid, inviter_jid.getStripped(), inviter_jid.getResource()], x_node.getAttr('jid'), body)
-
 
     def PresenceHandler(self, con, prs):
+        #print unicode(prs)
         self.call_presence_handlers(prs)
         t = prs.getType()
         groupchat = prs.getFrom().getStripped()
@@ -106,7 +145,12 @@ class Connection(Client):
         if groupchat in Config().groupchats:
             if t == 'available' or t == None:
                 if not Config().groupchats[groupchat]['participants'].has_key(nick):
-                    Config().groupchats[groupchat]['participants'][nick] = {'jid': prs.getFrom(), 'idle': time()}
+                    jid = prs.getJid()
+                    if jid:
+                        jid = JID(jid)
+                    else:
+                        jid = prs.getFrom()
+                    Config().groupchats[groupchat]['participants'][nick] = {'jid': jid, 'idle': time()}
                     self.call_join_handlers(groupchat, nick)
                     sleep(0.5)
             elif t == 'unavailable':
@@ -142,8 +186,6 @@ class Connection(Client):
         else:
             sys_exit(0)
 
-
-
     def call_message_handlers(self, type, source, body):
         for handler in self.message_handlers:
             thread.start_new(handler, (type, source, body))
@@ -168,9 +210,19 @@ class Connection(Client):
         for handler in self.presence_handlers:
             thread.start_new(handler, (prs,))
 
-    def call_groupchat_invite_handlers(self, source, groupchat, body):
+    def call_groupchat_invite_handlers(self, source, groupchat, subject, body,
+                                       reason, password):
         for handler in self.groupchat_invite_handlers:
-            thread.start_new(handler, (source, groupchat, body))
+            thread.start_new(handler, (source, groupchat, subject, body,
+                                       reason, password))
+
+    def call_groupchat_decline_handlers(self, source, groupchat, reason):
+        for handler in self.groupchat_decline_handlers:
+            thread.start_new(handler, (source, groupchat, reason))
+
+    def call_groupchat_config_handlers(self, groupchat, element, new_value):
+        for handler in self.groupchat_config_handlers:
+            thread.start_new(handler, (groupchat, element, new_value))
 
     def call_command_handlers(self, command, type, source, parameters):
         if self.command_handlers.has_key(command):
@@ -178,8 +230,6 @@ class Connection(Client):
                 thread.start_new(self.command_handlers[command]['handler'], (type, source, parameters))
             else:
                 self.smsg(type, source, 'Unauthorized')
-
-
         
     def msg(self, target, body):
         msg = Message(target, body)
@@ -207,12 +257,10 @@ class Connection(Client):
         if password:
             x.setTagData('password', password)
         self.send(p)
-        if auto:
-            #if not Config().groupchats.has_key(groupchat):
-            Config().groupchats[groupchat] = {'autojoin': True, 'nick': nick,
-                                              'participants': dict()}
-            Config().save('groupchats')
-        
+        Config().groupchats[groupchat] = {'autojoin': auto, 'nick': nick,
+                                          'participants': dict()}
+        Config().save('groupchats')
+
     def part(self, groupchat):
         self.send(Presence(groupchat, 'unavailable'))
         if Config().groupchats.has_key(groupchat):

@@ -16,6 +16,9 @@
     * plugin Log: addition of a html link on each timestamp
     * config file is now in xml \o/
     * system logging facility
+    * added two handlers: groupchat_decline_handler and
+      groupchat_config_handler
+    * a lot of fixed bugs
     * a lot of optimizations
 
 

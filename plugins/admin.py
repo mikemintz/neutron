@@ -42,9 +42,10 @@ class Admin:
         self.groupchat_invite_handlers = [self.admin_groupchat_invite_handler]
 
 
-    def admin_groupchat_invite_handler(self, source, groupchat, body):
+    def admin_groupchat_invite_handler(self, source, groupchat, subject, body,
+                                       reason, password):
         if self.config.has_access(source, self.conn.command_handlers['!join']['access']):
-            self.conn.join(groupchat)
+            self.conn.join(groupchat, password=password)
 
     def handler_admin_join(self, type, source, parameters):
         if parameters:

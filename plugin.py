@@ -55,7 +55,9 @@ class Plugin:
                              ['part_handlers', 3],
                              ['iq_handlers', 2],
                              ['presence_handlers', 2],
-                             ['groupchat_invite_handlers', 4]]:
+                             ['groupchat_invite_handlers', 7],
+                             ['groupchat_decline_handlers', 4],
+                             ['groupchat_config_handlers', 4]]:
             if obj.__dict__.has_key(key) and obj.__dict__[key]:
                 for handler in obj.__dict__[key]:
                     if handler.func_code.co_argcount != nb_args:
