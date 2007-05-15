@@ -103,7 +103,7 @@ class Neutron:
                                               self.conn.lastErr))
             sys_exit(1)
         self.conn.sendInitPresence()
-
+        self.conn.call_handlers('post_connection')
 
     def autojoin_rooms(self):
         for groupchat in Config().groupchats.iterkeys():

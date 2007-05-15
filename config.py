@@ -32,9 +32,9 @@ class Config(object):
     ref = None
     ref2 = None
 
-    def __new__(cls, *args, **kw):
+    def __new__(cls, *args, **kwds):
         if cls.ref is None:
-            cls.ref = super(Config, cls).__new__(cls, *args, **kw)
+            cls.ref = super(Config, cls).__new__(cls, *args, **kwds)
         return cls.ref
     
     def __init__(self, filename = 'config.txt'):

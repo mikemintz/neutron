@@ -49,21 +49,25 @@ class Plugin:
             if obj.__dict__.has_key(key):
                 continue
             obj.__dict__[key] = None
-        for key, nb_args in [['message_handlers', 4],
-                             ['outgoing_message_handlers', 3],
-                             ['join_handlers', 3],
-                             ['part_handlers', 3],
-                             ['iq_handlers', 2],
-                             ['presence_handlers', 2],
-                             ['groupchat_invite_handlers', 7],
-                             ['groupchat_decline_handlers', 4],
-                             ['groupchat_config_handlers', 4]]:
-            if obj.__dict__.has_key(key) and obj.__dict__[key]:
-                for handler in obj.__dict__[key]:
+        for key, nb_args in [['post_connection', 1],
+                             ['post_deconnection', 1],
+                             ['message', 4],
+                             ['outgoing_message', 3],
+                             ['join', 3],
+                             ['part', 3],
+                             ['iq', 2],
+                             ['presence', 2],
+                             ['groupchat_invite', 7],
+                             ['groupchat_decline', 4],
+                             ['groupchat_config', 4]]:
+            key_handlers = '%s_handlers' % key
+            if (obj.__dict__.has_key(key_handlers) and
+                obj.__dict__[key_handlers]):
+                for handler in obj.__dict__[key_handlers]:
                     if handler.func_code.co_argcount != nb_args:
                         Plugin.logger.error('Plugin %s v%s : handler %s doesn\'t have %s arguments !' % (obj.name, obj.version, handler.func_code.co_name, nb_args))
                         raise
-                conn.__dict__[key].extend(obj.__dict__[key])
+                conn.handlers[key].extend(obj.__dict__[key_handlers])
         if obj.__dict__.has_key('command_handlers') and \
                obj.__dict__['command_handlers']:
             for handler, command, access, description, syntax, examples in \
