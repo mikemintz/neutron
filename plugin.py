@@ -25,6 +25,7 @@
 from config import Config
 from logging import getLogger
 from os import access as os_access, F_OK
+from xmpp import NodeProcessed
 
 class Plugin:
     logger = getLogger('plugin')
@@ -39,6 +40,7 @@ class Plugin:
         cls.read_file = self.read_file
         cls.write_file = self.write_file
         cls.logger = getLogger('plugin.%s' % str(cls).split('.')[1])
+        cls.NodeProcessed = NodeProcessed
         obj = cls()
         if obj.__dict__.has_key(self.__class__.__name__):
             Plugin.logger.error('Plugin %s v%s already plugged' % \

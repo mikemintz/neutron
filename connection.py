@@ -27,7 +27,7 @@ from os import execl, name as os_name
 from sys import argv, exit as sys_exit, executable as sys_executable
 from thread import start_new_thread
 from time import sleep, time
-from xmpp import Client, Iq, JID, Message, Presence
+from xmpp import Client, Iq, JID, Message, NodeProcessed, Presence
 from xmpp import NS_CLIENT, NS_MUC, NS_MUC_USER, NS_VERSION
 
 from config import Config
@@ -177,7 +177,9 @@ class Connection(Client):
             query.setTagData('version', '0.5.42')
             query.setTagData('os', os_name)
             self.send(result)
-        self.call_handlers('iq', iq_)
+            raise NodeProcessed
+        else:
+            self.call_handlers('iq', iq_)
 
     def disconnect_handler(self):
         self.logger.info('disconnected')
