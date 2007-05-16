@@ -1,5 +1,7 @@
 #$ neutron_plugin 01
 
+# Author: bloody
+
 import urllib2,re,time
 def prog_grab(code):
 	
