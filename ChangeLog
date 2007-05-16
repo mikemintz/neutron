@@ -18,6 +18,9 @@
     * system logging facility
     * added two handlers: groupchat_decline_handler and
       groupchat_config_handler
+    * support for ad-hoc commands (thanks Omega)
+    * new plugin Xep (plugins/xep.py) which allow to obtain informations
+      about xeps
     * a lot of fixed bugs
     * a lot of optimizations
 

@@ -23,30 +23,39 @@
 
 class Help:
     def __init__(self):
-	self.neutron_version = ('0.5.42')
-	self.version = '2.0'
-	self.name = 'Help'
-	self.description = 'Some help about Neutron\'s commands'
-	self.homepageurl = 'http://ejabberd.jabber.ru/neutron'
-	self.updateurl = None
+        self.neutron_version = ('0.5.42')
+        self.version = '2.0'
+        self.name = 'Help'
+        self.description = 'Some help about Neutron\'s commands'
+        self.homepageurl = 'http://ejabberd.jabber.ru/neutron'
+        self.updateurl = None
         self.command_handlers = [
-            [self.handler_help_help, 'help', 0, 'Send basic help message or gives information on specified command.', 'help [command]', ['help', 'help help']],
-            [self.handler_help_commands, '!commands', 0, 'Send list of commands.', '!commands', ['!commands']]]
+            [self.handler_help_help, 'help', 0,
+             'Send basic help message or gives information on specified \
+             command.', 'help [command]', ['help', 'help help']],
+            [self.handler_help_commands, '!commands', 0,
+             'Send list of commands.', '!commands', ['!commands']]]
 
-    def handler_help_help(self, type, source, parameters):
-        if parameters and self.conn.command_handlers.has_key(parameters):
-            reply = self.conn.command_handlers[parameters]['description'] + ' Usage: ' + self.conn.command_handlers[parameters]['syntax'] + '\nExamples:'
-            for example in self.conn.command_handlers[parameters]['examples']:
+    def handler_help_help(self, type_, source, parameters):
+        command_handlers = self.conn.command_handlers
+        if parameters and command_handlers.has_key(parameters):
+            reply = '%s Usage: %s\nExamples:' % \
+                    (command_handlers[parameters]['description'],
+                     command_handlers[parameters]['syntax'])
+            for example in command_handlers[parameters]['examples']:
                 reply += '\n  *  ' + example
-            reply += '\nRequired Access Level: ' + str(self.conn.command_handlers[parameters]['access'])
+            reply += '\nRequired Access Level: %s' % \
+                     (str(command_handlers[parameters]['access']))
         else:
             reply = 'Type !commands for a list of commands.'
-        self.conn.smsg(type, source, reply)
+        self.conn.smsg(type_, source, reply)
 
-    def handler_help_commands(self, type, source, parameters):
+    def handler_help_commands(self, _, source, __):
         commandlist = []
+        command_handlers = self.conn.command_handlers
         for command in self.conn.command_handlers.keys():
-            if self.config.has_access(source, self.conn.command_handlers[command]['access']):
+            if self.config.has_access(source,
+                                      command_handlers[command]['access']):
                 commandlist.append(command)
         commandlist.sort()
         commandlist = ' '.join(commandlist)

@@ -21,8 +21,8 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from os import abort, execv
-from sys import exit as sys_exit
+from os import execv
+from sys import argv as sys_argv, exit as sys_exit
 
 class Admin:
     def __init__(self):
@@ -33,21 +33,35 @@ class Admin:
         self.homepageurl = 'http://ejabberd.jabber.ru/neutron'
         self.updateurl = None
         self.command_handlers = [
-            [self.handler_admin_join, '!join', 100, 'Joins specified groupchat.', '!join <groupchat> [nick]', ['!join jabber@conference.jabber.org', '!join jdev@conference.jabber.org neutron2']],
-            [self.handler_admin_part, '!part', 100, 'Joins specified (or current) groupchat.', '!leave [groupchat]', ['!leave jabber@conference.jabber.org', '!leave']],
-            [self.handler_admin_msg, '!msg' , 100, 'Sends a message to specified JID.', '!msg <jid> <message>', ['!msg mikem@jabber.org hey mike!']],
-            [self.handler_admin_say, '!say', 100, 'Sends a message to current groupchat or to your JID if message is not through groupchat.', '!say <message>', ['!say hi']],
-            [self.handler_admin_restart, '!restart', 100, 'Restarts me.', '!restart', ['!restart']],
-            [self.handler_admin_exit, '!exit', 100, 'Exits completely.', '!exit', ['!exit']]]
+            [self.handler_admin_join, '!join', 100,
+             'Joins specified groupchat.', '!join <groupchat> [nick]',
+             ['!join jabber@conference.jabber.org',
+              '!join jdev@conference.jabber.org neutron2']],
+            [self.handler_admin_part, '!part', 100,
+             'Joins specified (or current) groupchat.', '!part [groupchat]',
+             ['!part jabber@conference.jabber.org', '!part']],
+            [self.handler_admin_msg, '!msg' , 100,
+             'Sends a message to specified JID.', '!msg <jid> <message>',
+             ['!msg mikem@jabber.org hey mike!']],
+            [self.handler_admin_say, '!say', 100,
+             'Sends a message to current groupchat or to your JID if message \
+is not through groupchat.',
+             '!say <message>', ['!say hi']],
+            [self.handler_admin_restart, '!restart', 100, 'Restarts me.',
+             '!restart', ['!restart']],
+            [self.handler_admin_exit, '!exit', 100, 'Exits completely.',
+             '!exit', ['!exit']]]
         self.groupchat_invite_handlers = [self.admin_groupchat_invite_handler]
 
 
     def admin_groupchat_invite_handler(self, source, groupchat, subject, body,
                                        reason, password):
-        if self.config.has_access(source, self.conn.command_handlers['!join']['access']):
+        if self.config.has_access(source,
+                                  self.conn.command_handlers['!join']['access']
+                                  ):
             self.conn.join(groupchat, password=password)
 
-    def handler_admin_join(self, type, source, parameters):
+    def handler_admin_join(self, type_, source, parameters):
         if parameters:
             if len(parameters.split()) > 1:
                 (groupchat, nick) = parameters.lstrip().split(' ', 1)
@@ -55,37 +69,37 @@ class Admin:
             else:
                 groupchat = parameters.strip()
                 self.conn.join(groupchat)
-            self.conn.smsg(type, source, 'Joined ' + groupchat)
+            self.conn.smsg(type_, source, 'Joined ' + groupchat)
         else:
-            self.conn.smsg(type, source, 'Invalid Syntax')
+            self.conn.smsg(type_, source, 'Invalid Syntax')
 
-    def handler_admin_part(self, type, source, parameters):
+    def handler_admin_part(self, type_, source, parameters):
         if len(parameters.split()) > 0:
             groupchat = parameters.strip()
         else:
             groupchat = source[1]
         self.conn.part(groupchat)
-        self.conn.smsg(type, source, 'Left ' + groupchat)
+        self.conn.smsg(type_, source, 'Left ' + groupchat)
 
-    def handler_admin_msg(self, type, source, parameters):
+    def handler_admin_msg(self, type_, source, parameters):
         self.conn.msg(parameters.split()[0], ' '.join(parameters.split()[1:]))
-        self.conn.smsg(type, source, 'Message Sent')
+        self.conn.smsg(type_, source, 'Message Sent')
 
-    def handler_admin_say(self, type, source, parameters):
+    def handler_admin_say(self, type_, source, parameters):
         if parameters:
             self.conn.msg(source[1], parameters)
         else:
-            self.conn.smsg(type, source, 'Enter Message')
+            self.conn.smsg(type_, source, 'Enter Message')
 
-    def handler_admin_restart(self, type, source, parameters):
-        ##os.startfile(sys.argv[0])
-        self.conn.smsg(type, source, 'Restarting')
+    def handler_admin_restart(self, type_, source, _):
+        ##os.startfile(sys_argv[0])
+        self.conn.smsg(type_, source, 'Restarting')
         self.conn.disconnect()
-        execv('./neutron.py', sys.argv)
+        execv('./neutron.py', sys_argv)
 
-    def handler_admin_exit(self, type, source, parameters):
-        ##os.startfile(sys.argv[0])
-        self.conn.smsg(type, source, 'Exiting')
+    def handler_admin_exit(self, type_, source, _):
+        ##os.startfile(sys_argv[0])
+        self.conn.smsg(type_, source, 'Exiting')
         self.config.halt = True
         self.conn.disconnect()
         sys_exit(0)

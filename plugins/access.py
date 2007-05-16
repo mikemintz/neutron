@@ -30,43 +30,56 @@ class Access:
         self.homepageurl = 'http://ejabberd.jabber.ru/neutron'
         self.updateurl = None
         self.command_handlers = [
-		[self.handler_access_login, '!login', 0, 'Logs in as admin.', '!login <password>', ['!login mypassword']],
-		[self.handler_access_login, '!logout', 0, 'Logs out of admin.', '!logout', ['!logout']],
-		[self.handler_access_view_access, '!view_access', 0, 'Returns access level of specified JID. JID defaults to requester.', '!view_access [JID]', ['!view_access', '!view_access mikem@jabber.org']],
-		[self.handler_access_set_access, '!set_access', 100, 'Sets the access level of specified JID to specified level. If a third parameter is defined, the change will be permanent, otherwise it will reset when Neutron exits.', '!set_access <JID> <level#> [permanent]', ['!set_access mikem@jabber.org 100', '!set_access mikem@jabber.org 100 blabla']]]
+		[self.handler_access_login, '!login', 0, 'Logs in as admin.',
+                 '!login <password>', ['!login mypassword']],
+		[self.handler_access_logout, '!logout', 0,
+                 'Logs out of admin.', '!logout', ['!logout']],
+		[self.handler_access_view_access, '!view_access', 0,
+                 'Returns access level of specified JID. JID defaults to \
+requester.', '!view_access [JID]',
+                 ['!view_access', '!view_access foo@example.org']],
+		[self.handler_access_set_access, '!set_access', 100,
+                 'Sets the access level of specified JID to specified level. \
+If a third parameter is defined, the change will be permanent, otherwise it \
+will reset when Neutron exits.',
+                 '!set_access <JID> <level#> [permanent]',
+                 ['!set_access foo@example.org 100',
+                  '!set_access foo@example.org 100 blabla']]]
 
-    def handler_access_login(self, type, source, parameters):
-        if type == 'public':
-	    self.conn.smsg(type, source, 'Please login privately so others do not see the password.')
-        elif type == 'private':
+    def handler_access_login(self, type_, source, parameters):
+        if type_ == 'public':
+            self.conn.smsg(type_, source, 'Please login privately so others \
+do not see the password.')
+        elif type_ == 'private':
             jid = self.config.get_true_jid(source)
             if parameters.strip() == self.config.admin_password:
                 self.config.change_access_temp(jid, 100)
-                self.conn.smsg(type, source, 'Access Granted')
+                self.conn.smsg(type_, source, 'Access Granted')
             else:
-                self.conn.smsg(type, source, 'Access Denied')
+                self.conn.smsg(type_, source, 'Access Denied')
 
-    def handler_access_logout(self, type, source, parameters):
+    def handler_access_logout(self, type_, source, parameters):
         jid = self.config.get_true_jid(source)
         self.config.change_access_temp(jid, 0)
-        self.conn.smsg(type, source, 'Successfully Logged Out')
+        self.conn.smsg(type_, source, 'Successfully Logged Out')
 
-    def handler_access_view_access(self, type, source, parameters):
+    def handler_access_view_access(self, type_, source, parameters):
         if not parameters.strip():
-            self.conn.smsg(type, source, str(self.config.user_level(source)))
+            self.conn.smsg(type_, source, str(self.config.user_level(source)))
         else:
-            self.conn.smsg(type, source, str(self.config.user_level(parameters)))
+            self.conn.smsg(type_, source,
+                           str(self.config.user_level(parameters)))
 
-    def handler_access_set_access(self, type, source, parameters):
-	splitdata = parameters.split()
-	if len(splitdata) == 2:
-		self.config.change_access_temp(splitdata[0], splitdata[1])
-		self.conn.smsg(type, source, 'Temporary Access Change Successful')
-	elif len(splitdata) == 3:
-		self.config.change_access_perm(splitdata[0], splitdata[1])
-		self.conn.smsg(type, source, 'Permanent Access Change Successful')
-	else:
-		self.conn.smsg(type, source, 'Invalid Syntax')
+    def handler_access_set_access(self, type_, source, parameters):
+        splitdata = parameters.split()
+        if len(splitdata) == 2:
+            self.config.change_access_temp(splitdata[0], splitdata[1])
+            self.conn.smsg(type_, source, 'Temporary Access Change Successful')
+        elif len(splitdata) == 3:
+            self.config.change_access_perm(splitdata[0], splitdata[1])
+            self.conn.smsg(type_, source, 'Permanent Access Change Successful')
+        else:
+            self.conn.smsg(type_, source, 'Invalid Syntax')
 
 
 
