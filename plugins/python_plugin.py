@@ -18,10 +18,11 @@ def handler_python_exec(type, source, parameters):
 	smsg(type, source, return_value)
 
 def handler_python_sh(type, source, parameters):
-	pipe = os.popen('sh -c ' + '"' + parameters + '"')
+	pipe = os.popen('sh -c "%s"' % parameters)
 	#time.sleep(0.5)
 	return_value = pipe.read(1024*4)
-	smsg(type, source, return_value)
+        print return_value
+	smsg(type, source, unicode(return_value, 'utf8'))
 
 register_command_handler(handler_python_eval, '!eval', 100, 'Evaluates and returns a Python expression.', '!eval <expression>', ['!eval 1+1'])
 register_command_handler(handler_python_exec, '!exec', 100, 'Runs a Python statement.', '!exec <statement>', ['!eval pass'])
