@@ -14,6 +14,10 @@ import random
 import types
 import traceback
 import getopt
+#
+import ircbot
+import irclib
+#
 
 ################################################################################
 
