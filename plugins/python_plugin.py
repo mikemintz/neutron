@@ -18,9 +18,11 @@ def handler_python_exec(type, source, parameters):
 	smsg(type, source, return_value)
 
 def handler_python_sh(type, source, parameters):
-	pipe = os.popen('sh -c "%s"' % parameters)
-	#time.sleep(0.5)
-	return_value = pipe.read(1024*4)
+	# Send STDERR to STDOUT.
+	pipe = os.popen('sh -c "%s" 2>&1' % parameters)
+	# time.sleep(0.5)
+	# 8k buffer equals to 4 standard console (80x25) pages.
+	return_value = pipe.read(1024*8)
         print return_value
 	smsg(type, source, unicode(return_value, 'utf8'))
 
