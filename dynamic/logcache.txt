@@ -1,1 +1,1 @@
-{u'elghinn42@jabber.fr': u'privatechatlogs/elghinn42@jabber.fr/2007/3/16.html', u'debian-fr@chat.jabberfr.org': u'publiclogs/debian-fr@chat.jabberfr.org/2007/3/16.html'}
+{}
