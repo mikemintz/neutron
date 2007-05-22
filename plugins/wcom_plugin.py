@@ -12,16 +12,12 @@ def handler_wcom(type, source, parameters):
         param = str(parameters).upper()
     else:
         param = 'UKXX0010'
-    #print source
-    #print param
-    #proxies = {'http': 'http://192.168.0.1:3128'}
     title = ""
     if len(param) <> 8 :
         param = 'UKXX0010'
         title = '\n*** Wrong format, falling back ***\n'			
     try:
-        response = urlopen('http://xoap.weather.com/weather/local/'+param+'?cc=*&dayf=1&unit=m')
-        #response = urlopen('http://xoap.weather.com/weather/local/'+param+'?cc=*&dayf=1&unit=m', proxies=proxies)
+	    response = urlopen('http://xoap.weather.com/weather/local/'+param+'?cc=*&dayf=1&unit=m' ,proxies=proxies)
     except:
         print "Unexpected error:", exc_info()[0]
 	
