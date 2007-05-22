@@ -3,6 +3,7 @@
 
 0.5.x - 08/May/2007 - Gh0st
 	* neutron.py: Bootup timestamp
+	* neutron.py/ some plugins: added http proxy support
 	* yasmine_plugin.py: (new) !rooms !uptime
 	* babel_plugin.py: !enru fix (now works fine with phrases)
 	* start.py: Startup script (use killall python to kill it)
