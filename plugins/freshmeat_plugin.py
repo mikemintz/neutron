@@ -7,7 +7,7 @@ def getVal(dom, var):
     return dom.getElementsByTagName(var)[0].childNodes[0].nodeValue
 
 def handler_fm(type, source, pn):
-    data = urllib.urlopen('http://freshmeat.net/projects-xml/' + pn).read()
+    data = urllib.urlopen('http://freshmeat.net/projects-xml/' + pn, proxies=proxies).read()
     try:
         dom = parseString(data)
         reply = "*" + getVal(dom, "projectname_full")
