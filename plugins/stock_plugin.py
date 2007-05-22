@@ -4,7 +4,7 @@ import urllib
 
 def handler_stock_stock(type, source, parameters):
 	if parameters:
-		data = urllib.urlopen('http://finance.yahoo.com/d/quotes.csv?s=' + parameters + '&f=sl1d1t1c1ohgv&e=.csv').read()
+		data = urllib.urlopen('http://finance.yahoo.com/d/quotes.csv?s=' + parameters + '&f=sl1d1t1c1ohgv&e=.csv', proxies=proxies).read()
 		data = data.replace('"', '')
 		(stock_name, stock_current, stock_date, stock_time, stock_change, stock_open, stock_high, stock_low, stock_volume) = string.split(data.strip(), ',')
 		if stock_change == 'N/A':
