@@ -18,6 +18,8 @@ import getopt
 import ircbot
 import irclib
 #
+import urllib
+import urllib2
 
 ################################################################################
 
@@ -51,6 +53,21 @@ PRIVATE_LOG_DIR = GENERAL_CONFIG['PRIVATE_LOG_DIR']
 
 INITSCRIPT_FILE = GENERAL_CONFIG['INITSCRIPT_FILE']
 
+#  Gh0st addition
+HTTP_PROXY = GENERAL_CONFIG['HTTP_PROXY']
+
+if HTTP_PROXY != "":
+    proxy_support = urllib2.ProxyHandler({"http" : HTTP_PROXY})
+    # urllib
+    proxies = {'http': HTTP_PROXY}
+    # environment variable for urllib
+    http_proxy = HTTP_PROXY
+    # urllib2
+    opener = urllib2.build_opener(proxy_support, '', urllib2.CacheFTPHandler)
+    urllib2.install_opener(opener)
+else:
+    proxies = {}
+# end of addition
 BOOTUP_TIMESTAMP = time.time()
 
 ################################################################################
