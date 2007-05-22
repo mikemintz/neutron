@@ -111,6 +111,8 @@ tv       Returns TV programme for one of supported channels
   Other:
 update   Updates Neutron from Internet (does not work)
   Russian:
+bashorg  Gives random quotes from bash.org / bash.org.ru  / linux.org.ru / python.org
+tv	 Returns TV programme for one of supported channels
 quiz     Quiz in chatroom (requires quizdata.txt)
   Spanish:
 saluda   It's a modification of quote plugin (requires saludos.txt and saludos2.txt)
