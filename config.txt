@@ -8,6 +8,10 @@
 'PASSWORD': 'password',
 'RESOURCE': 'neutron' + str(random.randrange(1000, 9999)),
 
+# Proxy support
+#'HTTP_PROXY': 'http://192.168.2.1:3128',
+'HTTP_PROXY': '',
+
 # Chatroom nick
 'DEFAULT_NICK': 'neutron',
 
