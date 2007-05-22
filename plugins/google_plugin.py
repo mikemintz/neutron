@@ -1,6 +1,7 @@
 #$ neutron_plugin 01
 
 import google
+import SOAP
 
 def google_remove_html(text):
 	nobold = text.replace('<b>', '').replace('</b>', '')
@@ -12,7 +13,9 @@ def google_search(query):
 	try:
     	    data = google.doGoogleSearch(query)
 	except SOAP.HTTPError:
-	    return 'Google API Error.'    
+	    return '\r\nGoogle API Error.'
+	except SOAP.faultType:
+	    return '\r\nInvalid Google Key. Maybe still default??\r\nTake a look on modules/googlekey.txt'    
 	try:
 		first = data.results[0]
 		url = first.URL
