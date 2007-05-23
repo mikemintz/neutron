@@ -10,6 +10,8 @@
 	* log_plugin.py: critical fixes that avoid tracebacks & headers fixes.
 	* dns_plugin.py: New server type feature.
 	* wcom_plugin.py: (new) weather.com plugin.
+	* PyIRClib: (new) native irc support (devel).
+	* PyAIML: (new) AIML support (www.alicebot.org) (works, one brain only for the time being).
 
 
 

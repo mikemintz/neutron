@@ -20,6 +20,8 @@ import irclib
 #
 import urllib
 import urllib2
+#
+import aiml
 
 ################################################################################
 
