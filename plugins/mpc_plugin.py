@@ -31,7 +31,7 @@ def mpc_command(command):
 	s = conn.recv(1024)
 	conn.close()
     except socket.error:
-	pass	
+	pass
     if re.search('OK',s):
 	for line in s.split('\n'):
 	    if line.strip():
@@ -47,6 +47,7 @@ def current_song(dummy):
 	album=''
 	title=''
 	date=''
+	return_value=''
 	s=mpc_command('currentsong')
 	for line in s.split('\r\n'):
 		if line.find('Date:') == 0:
@@ -61,7 +62,25 @@ def current_song(dummy):
 		if line.find('Title:') == 0:
             	     title = line.replace('Title:','')
 		     title = strip(title)
-	return_value = artist + ' - ' +  album + '(' + date + ') - ' + title  	
+	if len(artist)<>0:
+		return_value = artist
+
+	if len(album)<>0:
+		if len(artist)<>0:
+			return_value += ' - ' + album
+		else:
+			return_value  = album
+	if len(date)<>0:
+		if len(return_value)<>0:
+			return_value += '(' + date + ') - '
+		else:
+			return_value = '(' + date + ')'
+	if len(title)<>0:
+		if len(return_value)<>0:
+			return_value += title
+		else:
+			return_value = title			
+					 
 	return return_value
 
 def status(dummy):
@@ -109,9 +128,11 @@ def status(dummy):
 		     timepos = curposs + '/' + allposs
 		     perc = str(int(((curpos + 0.0)/allpos)*100))
 		          
-
-	return_value = '\n' + '[' + state + ']' + ' #' + song + '/' + total + '  ' + timepos + ' ' + perc + '%'
-	return_value += '\n' + 'volume: ' + volume + '% ' +  '  repeat: ' + repeat + '    random: ' + random
+	if dummy != "maxid":
+	    return_value = '\n' + '[' + state + ']' + ' #' + song + '/' + total + '  ' + timepos + ' ' + perc + '%'
+    	    return_value += '\n' + 'volume: ' + volume + '% ' +  '  repeat: ' + repeat + '    random: ' + random
+	else:
+	    return_value = total    
 	return return_value
 
 def toggle_handler(command):
@@ -184,12 +205,29 @@ def handler_mpc_volume(type, source, parameters):
 	    return_value='Error.'	
 	smsg(type, source, return_value)
 
+def handler_mpc_playid(type, source, parameters):
+	return_value = ''
+	min_id = 1 
+	max_id = int(status('maxid'))
+	if int(parameters):
+	    if int(parameters) >= min_id and int(parameters) <= max_id:
+		    parameters = str(int(parameters) - 1)
+		    if mpc_command('playid ' + str(parameters)) == 'OK':
+    				    return_value = current_song('') + status('')
+	    else:
+		    return_value='ID out of range. Valid values are: ' + str(min_id) + ' to ' + str(max_id)
+	else:
+	    return_value='Error.'	
+	smsg(type, source, return_value)
+	
+
 
 # useful for console development
 #def smsg(type, source, parameters):
 #	print parameters
 	
 register_command_handler(handler_mpc_play, '!mpc_play', 100, 'Start playing in mpd.', '!mpc_play', ['!mpc_play'])
+register_command_handler(handler_mpc_playid, '!mpc_playid', 100, 'Start playing ID in mpd.', '!mpc_playid 50', ['!mpc_playid 50'])
 register_command_handler(handler_mpc_pause, '!mpc_pause', 100, 'Pauses playing in mpd.', '!mpc_pause', ['!mpc_pause'])
 register_command_handler(handler_mpc_next, '!mpc_next', 100, 'Plays next song in mpd.', '!mpc_next', ['!mpc_next'])
 register_command_handler(handler_mpc_prev, '!mpc_prev', 100, 'Plays previous song in mpd.', '!mpc_prev', ['!mpc_prev'])
