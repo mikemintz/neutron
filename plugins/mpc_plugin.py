@@ -20,6 +20,7 @@ def sec2minsec(in_seconds):
     return return_value
 		
 def mpc_command(command):
+    err = 0
     global mpc_server
     global mpc_port
     suffix='\r\nclose\r\n'
@@ -31,15 +32,18 @@ def mpc_command(command):
 	s = conn.recv(1024)
 	conn.close()
     except socket.error:
+	err = 1
 	pass
-    if re.search('OK',s):
-	for line in s.split('\n'):
-	    if line.strip():
-		if not re.search('OK',line):
-		    reply += line + '\r\n'
-	if reply.strip() == '':
-	    reply = 'OK'
-			    
+    if err == 0:	
+	if re.search('OK',s):
+	    for line in s.split('\n'):
+		if line.strip():
+		    if not re.search('OK',line):
+			reply += line + '\r\n'
+	    if reply.strip() == '':
+		reply = 'OK'
+    else:
+		reply = 'Connection Error.'		
     return reply		    
 
 def current_song(dummy):
@@ -93,6 +97,7 @@ def status(dummy):
 	timepos = ''
 	timestr = ''
 	perc = ''
+	return_value = ''
 	s=mpc_command('status')
 	for line in s.split('\r\n'):
 		if line.find('state:') == 0:
@@ -129,7 +134,33 @@ def status(dummy):
 		     perc = str(int(((curpos + 0.0)/allpos)*100))
 		          
 	if dummy != "maxid":
-	    return_value = '\n' + '[' + state + ']' + ' #' + song + '/' + total + '  ' + timepos + ' ' + perc + '%'
+	    
+	    if len(state)<>0:
+		return_value = '\n' + '[' + state + ']'
+
+	    if len(song)<>0:
+		if len(state)<>0:
+			return_value += ' #' + song
+		else:
+			return_value  = ' #' + song
+	    if len(total)<>0:
+		if len(return_value)<>0:
+			if total != '0':
+			    return_value += '/' + total + '  '
+		else:
+			return_value = ' Total: ' + total
+	    if len(timepos)<>0:
+		if len(return_value)<>0:
+			return_value += timepos  + ' '
+		else:
+			return_value = 'Timepos: ' + timepos
+	    if len(perc)<>0:
+		if len(return_value)<>0:
+			return_value += perc  + '%'
+		else:
+			return_value = 'Percentage: ' + perc + '%'
+	
+	    #return_value = '\n' + '[' + state + ']' + ' #' + song + '/' + total + '  ' + timepos + ' ' + perc + '%'
     	    return_value += '\n' + 'volume: ' + volume + '% ' +  '  repeat: ' + repeat + '    random: ' + random
 	else:
 	    return_value = total    
@@ -142,7 +173,7 @@ def toggle_handler(command):
 		return_value='Error.'
 	return return_value	
 
-def on_off_handler(value, command):
+def on_off_handler(parameters, command):
 	return_value = ''
 	if not parameters.strip() == "":
 		if str(parameters) == "off" or str(parameters) == "on":
@@ -195,7 +226,7 @@ def handler_mpc_repeat(type, source, parameters):
 
 def handler_mpc_volume(type, source, parameters):
 	return_value = ''
-	if int(parameters):
+	if parameters.strip() != '' and int(parameters):
 		if int(parameters) <= 100 and int(parameters) >= 1:
 		    if mpc_command('setvol ' + str(parameters)) == 'OK':
     				    return_value = current_song('') + status('')
@@ -207,9 +238,10 @@ def handler_mpc_volume(type, source, parameters):
 
 def handler_mpc_playid(type, source, parameters):
 	return_value = ''
-	min_id = 1 
-	max_id = int(status('maxid'))
-	if int(parameters):
+	min_id = 1
+	if status('maxid').strip() != '' and int(status('maxid')):
+	    max_id = int(status('maxid'))
+	if parameters.strip() != '' and int(parameters):
 	    if int(parameters) >= min_id and int(parameters) <= max_id:
 		    parameters = str(int(parameters) - 1)
 		    if mpc_command('playid ' + str(parameters)) == 'OK':
