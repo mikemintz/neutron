@@ -8,8 +8,8 @@ initialize_file(LOG_CACHE_FILE, '{}')
 LOG_FILENAME_CACHE = eval(read_file(LOG_CACHE_FILE))
 
 def log_write_header(fp, source, (year, month, day, hour, minute, second, weekday, yearday, daylightsavings)):
-    body=""
-    body="""<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    body="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
@@ -23,20 +23,20 @@ h1 { color: #336699; font-family: sans-serif; border-bottom: #224466 solid 3pt; 
 h2 { color: #663399; font-family: sans-serif; letter-spacing: 2px; text-align: center }
 //-->
 </style>
+<title>""" + source + """</title>
 </head>
 <body>
 <div style="color: #AAAAAA; text-align: right; font-family: monospace; letter-spacing: 3px">neutron log</div>
 <h1>""" + source + """</h1>
 <h2>""" + time.strftime('%A, %B %d, %Y', (year, month, day, hour, minute, second, weekday, yearday, daylightsavings)) + """</h2>
 <br />
-<tt>
-
+<code>
 """
     body=body.encode('utf-8')
     fp.write(body)
 
 def log_write_footer(fp):
-    fp.write('\n</tt>\n</body>\n</html>')
+    fp.write('\n</code>\n</body>\n</html>')
 
 def log_get_fp(type, source, (year, month, day, hour, minute, second, weekday, yearday, daylightsavings)):
     if type == 'public':
@@ -129,17 +129,17 @@ def log_handler_message(type, source, body):
         nick = nick.encode('utf-8');
         timestamp = log_get_timestamp(hour, minute)
         fp = log_get_fp('public', groupchat, (year, month, day, hour, minute, second, weekday, yearday, daylightsavings))
-        fp.write('<font class="timestamp">' + timestamp + '</font> ')
+        fp.write('<span class="timestamp">' + timestamp + '</span> ')
         if not nick:
-            fp.write('<font class="system">' + body + '</font><br />\n')
+            fp.write('<span class="system">' + body + '</span><br />\n')
         elif body[:3].lower() == '/me':
-            fp.write('<font class="emote">* ' + nick + body[3:] + '</font><br />\n')
+            fp.write('<span class="emote">* ' + nick + body[3:] + '</span><br />\n')
         else:
             # 08.03.05(Tue) slipstream@yandex.ru encoding
             if nick == get_nick(groupchat).encode('utf-8'):
-                fp.write('<font class="self">&lt;' + nick + '&gt;</font> ')
+                fp.write('<span class="self">&lt;' + nick + '&gt;</span> ')
             else:
-                fp.write('<font class="normal">&lt;' + nick + '&gt;</font> ')
+                fp.write('<span class="normal">&lt;' + nick + '&gt;</span> ')
             fp.write(body + '<br />\n')
         fp.close()
     elif type == 'private' and PRIVATE_LOG_DIR:
@@ -153,11 +153,11 @@ def log_handler_message(type, source, body):
         nick = nick.encode('utf-8');
         timestamp = log_get_timestamp(hour, minute)
         fp = log_get_fp('private', jid, (year, month, day, hour, minute, second, weekday, yearday, daylightsavings))
-        fp.write('<font class="timestamp">' + timestamp + '</font> ')
+        fp.write('<span class="timestamp">' + timestamp + '</span> ')
         if body[:3].lower() == '/me':
-            fp.write('<font class="emote">* ' + nick + body[3:] + '</font><br />\n')
+            fp.write('<span class="emote">* ' + nick + body[3:] + '</span><br />\n')
         else:
-            fp.write('<font class="normal">&lt;' + nick + '&gt;</font> ' + body + '<br />\n')
+            fp.write('<span class="normal">&lt;' + nick + '&gt;</span> ' + body + '<br />\n')
         fp.close()
 
 def log_handler_outgoing_message(target, body):
@@ -174,11 +174,11 @@ def log_handler_outgoing_message(target, body):
     nick = nick.encode('utf-8');
     timestamp = log_get_timestamp(hour, minute)
     fp = log_get_fp('private', jid, (year, month, day, hour, minute, second, weekday, yearday, daylightsavings))
-    fp.write('<font class="timestamp">' + timestamp + '</font> ')
+    fp.write('<span class="timestamp">' + timestamp + '</span> ')
     if body[:3].lower() == '/me':
-        fp.write('<font class="emote">* ' + nick + body[3:] + '</font><br />\n')
+        fp.write('<span class="emote">* ' + nick + body[3:] + '</span><br />\n')
     else:
-        fp.write('<font class="self">&lt;' + nick + '&gt;</font> ' + body + '<br />\n')
+        fp.write('<span class="self">&lt;' + nick + '&gt;</span> ' + body + '<br />\n')
     fp.close()
 
 if PUBLIC_LOG_DIR or PRIVATE_LOG_DIR:
