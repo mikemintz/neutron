@@ -22,9 +22,13 @@ import urllib
 import urllib2
 #
 import aiml
+#
+import iq
 
 ################################################################################
-
+iq.version = "0.5.x"
+iq.vername = "Neutron"
+#
 CONFIGURATION_FILE = 'dynamic/config.cfg'
 
 GENERAL_CONFIG_FILE = 'config.txt'
@@ -449,22 +453,9 @@ def presenceCB(con, prs):
 				join_groupchat(groupchat, nick + '_')
 				time.sleep(0.5)
 
+
+
 def iqCB(con, iq):
-        if iq.getTags('query', {}, xmpp.NS_VERSION):
-	        uname=os.popen("uname -sr", 'r')
-		os_ver=uname.read().strip()
-		uname.close()
-		pipe = os.popen('sh -c ' + '"' + 'python -V 2>&1' + '"')
-		python_ver = pipe.read(1024).strip()
-		os_ver = os_ver + ' ' + python_ver
-                result = iq.buildReply('result')
-	        query = result.getTag('query')
-    	        query.setTagData('name', 'Neutron')
-        	query.setTagData('version', '0.5.x')
-        	query.setTagData('os', os_ver)
-        	con.send(result)
-    		raise xmpp.NodeProcessed
-        else:
 	    call_iq_handlers(iq)
 
 def dcCB():
@@ -521,6 +512,16 @@ def start():
 	JCON.RegisterHandler('message', messageCB)
 	JCON.RegisterHandler('presence', presenceCB)
 	JCON.RegisterHandler('iq', iqCB)
+	## Parts of code from:
+	## OJAB iq module
+	## Copyright (C) Boris Kotov <admin@avoozl.ru>
+	JCON.RegisterHandler('iq', iq.versionCB, 'get', xmpp.NS_VERSION)
+	JCON.RegisterHandler('iq', iq.versionresultCB, 'result', xmpp.NS_VERSION)
+	JCON.RegisterHandler('iq', iq.versionerrorCB, 'error', xmpp.NS_VERSION)
+	JCON.RegisterHandler('iq', iq.timeCB, 'get', xmpp.NS_TIME)
+	JCON.RegisterHandler('iq', iq.timeresultCB, 'result', xmpp.NS_TIME)
+	JCON.RegisterHandler('iq', iq.timeerrorCB, 'error', xmpp.NS_TIME)
+	#####################
 	JCON.RegisterDisconnectHandler(dcCB)
 	JCON.UnregisterDisconnectHandler(JCON.DisconnectHandler)
 
