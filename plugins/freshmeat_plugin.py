@@ -15,6 +15,7 @@ def handler_fm(type, source, pn):
         reply += getVal(dom, "desc_full") + " " + getVal(dom, "url_homepage")
     except:
         reply = "This project not found on FreshMeat.net, sorry"
-        smsg(type, source, reply)
+    # This was really stupid typo...
+    smsg(type, source, reply)
 
 register_command_handler(handler_fm, '!fm', 0, 'Gives information about program from FreshMeat.net', '!fm program', ['!fm', '!fm Gajim'])
