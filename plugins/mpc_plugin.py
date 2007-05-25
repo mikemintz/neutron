@@ -14,9 +14,13 @@ mpc_server='localhost'
 mpc_port=6600
 
 def sec2minsec(in_seconds):
-    seconds = in_seconds % 60
-    minutes = (in_seconds / 60) % 60
-    return_value = str(minutes) + ':' + str(seconds)
+    seconds = str(in_seconds % 60)
+    if len(seconds) == 1:
+	    seconds = '0' + seconds
+    minutes = str(in_seconds / 60)
+    if len(minutes) == 1:
+	    minutes = '0' + minutes
+    return_value = minutes + ':' + seconds
     return return_value
 		
 def mpc_command(command):
@@ -66,6 +70,7 @@ def current_song(dummy):
 		if line.find('Title:') == 0:
             	     title = line.replace('Title:','')
 		     title = strip(title)
+
 	if len(artist)<>0:
 		return_value = artist
 
@@ -81,7 +86,10 @@ def current_song(dummy):
 			return_value = '(' + date + ')'
 	if len(title)<>0:
 		if len(return_value)<>0:
-			return_value += title
+			if len(album) == 0:
+			    return_value += ' - ' + title
+			else:
+			    return_value += title    
 		else:
 			return_value = title			
 					 
@@ -103,6 +111,12 @@ def status(dummy):
 		if line.find('state:') == 0:
             	     state = line.replace('state:','')
 		     state = strip(state)
+		     if state == "play":
+		    	    state = 'playing'
+		     if state == "pause":
+		    	    state = 'paused'
+		     if state == "stop":
+		    	    state = 'stopped'	    	    
 		if line.find('volume:') == 0:
             	     volume = line.replace('volume:','')
 		     volume = strip(volume)
@@ -156,12 +170,12 @@ def status(dummy):
 			return_value = 'Timepos: ' + timepos
 	    if len(perc)<>0:
 		if len(return_value)<>0:
-			return_value += perc  + '%'
+			return_value += '(' + perc  + '%)'
 		else:
-			return_value = 'Percentage: ' + perc + '%'
+			return_value = 'Percentage: (' + perc + '%)'
 	
-	    #return_value = '\n' + '[' + state + ']' + ' #' + song + '/' + total + '  ' + timepos + ' ' + perc + '%'
-    	    return_value += '\n' + 'volume: ' + volume + '% ' +  '  repeat: ' + repeat + '    random: ' + random
+	    if (volume<>"") and (repeat<>"") and (random<>""):
+    		return_value += '\n' + 'volume: ' + volume + '% ' +  '  repeat: ' + repeat + '    random: ' + random
 	else:
 	    return_value = total    
 	return return_value
@@ -195,9 +209,15 @@ def on_off_handler(parameters, command):
 #
 ####################################################
 
+def handler_mpc(type, source, parameters):
+	return_value = current_song('') + status('')
+	smsg(type, source, return_value)
+
+
 def handler_mpc_play(type, source, parameters):
 	return_value = toggle_handler('play')
 	smsg(type, source, return_value)
+
 
 def handler_mpc_pause(type, source, parameters):
 	return_value = toggle_handler('pause')
@@ -257,7 +277,8 @@ def handler_mpc_playid(type, source, parameters):
 # useful for console development
 #def smsg(type, source, parameters):
 #	print parameters
-	
+
+register_command_handler(handler_mpc, '!mpc', 100, 'Shows status of mpd.', '!mpc', ['!mpc'])	
 register_command_handler(handler_mpc_play, '!mpc_play', 100, 'Start playing in mpd.', '!mpc_play', ['!mpc_play'])
 register_command_handler(handler_mpc_playid, '!mpc_playid', 100, 'Start playing ID in mpd.', '!mpc_playid 50', ['!mpc_playid 50'])
 register_command_handler(handler_mpc_pause, '!mpc_pause', 100, 'Pauses playing in mpd.', '!mpc_pause', ['!mpc_pause'])

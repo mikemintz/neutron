@@ -12,6 +12,8 @@
 	* wcom_plugin.py: (new) weather.com plugin.
 	* PyIRClib: (new) native irc support (devel).
 	* PyAIML: (new) AIML support (www.alicebot.org) (works, one brain only for the time being).
+	* iq.py: (new) Neutron now responds to iq:version and iq:time requests.
+	* neutron.py/config.txt: (new) Neutron now support HTTP proxys.
 
 
 
