@@ -47,11 +47,36 @@ def handler_admin_exit(type, source, parameters):
 	JCON.disconnect()
 	os.abort()
 
+def handler_admin_uptime(type, source, parameters):
+	if BOOTUP_TIMESTAMP:
+		idletime = int(time.time() - BOOTUP_TIMESTAMP)
+		reply = 'Neutron bot is up for: '
+		seconds = idletime % 60
+		minutes = (idletime / 60) % 60
+		hours = (idletime / 3600) % 60
+		days = idletime / 216000
+		if days: reply += str(days) + 'd '
+		if hours: reply += str(hours) + 'h '
+		if minutes: reply += str(minutes) + 'm '
+		reply += str(seconds) + 's'
+	else:
+		reply = 'Unknown'
+	smsg(type, source, reply)
+
+def handler_admin_rooms(type, source, parameters):
+	initialize_file(GROUPCHAT_CACHE_FILE, '[]')
+	groupchats = eval(read_file(GROUPCHAT_CACHE_FILE))
+        reply = '\n'.join(groupchats)
+	smsg(type, source, reply)
+
+
 register_command_handler(handler_admin_join, '!join', 100, 'Joins specified groupchat.', '!join <groupchat> [nick]', ['!join jabber@conference.jabber.org', '!join jdev@conference.jabber.org neutron2'])
 register_command_handler(handler_admin_leave, '!leave', 100, 'Joins specified (or current) groupchat.', '!leave [groupchat]', ['!leave jabber@conference.jabber.org', '!leave'])
 register_command_handler(handler_admin_msg, '!msg' ,100, 'Sends a message to specified JID.', '!msg <jid> <message>', ['!msg mikem@jabber.org hey mike!'])
 register_command_handler(handler_admin_say, '!say', 100, 'Sends a message to current groupchat or to your JID if message is not through groupchat.', '!say <message>', ['!say hi'])
 register_command_handler(handler_admin_restart, '!restart', 100, 'Restarts me.', '!restart', ['!restart'])
 register_command_handler(handler_admin_exit, '!exit', 100, 'Exits completely.', '!exit', ['!exit'])
+register_command_handler(handler_admin_uptime, '!uptime', 100, 'Returns Neutron uptime.', '!uptime', ['!uptime'])
+register_command_handler(handler_admin_rooms, '!rooms', 100, 'Returns Neutron\'s rooms.', '!rooms', ['!rooms'])
 
 register_groupchat_invite_handler(admin_groupchat_invite_handler)

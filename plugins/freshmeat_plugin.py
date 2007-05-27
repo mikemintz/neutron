@@ -18,4 +18,4 @@ def handler_fm(type, source, pn):
     # This was really stupid typo...
     smsg(type, source, reply)
 
-register_command_handler(handler_fm, '!fm', 0, 'Gives information about program from FreshMeat.net', '!fm program', ['!fm', '!fm Gajim'])
+register_command_handler(handler_fm, '!fm', 0, 'Gives information about program from FreshMeat.net', '!fm program', ['!fm Gajim', '!fm xmpppy'])

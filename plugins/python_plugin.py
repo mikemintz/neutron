@@ -21,9 +21,8 @@ def handler_python_sh(type, source, parameters):
 	# Send STDERR to STDOUT.
 	pipe = os.popen('sh -c "%s" 2>&1' % parameters)
 	# time.sleep(0.5)
-	# 8k buffer equals to 4 standard console (80x25) pages.
-	return_value = pipe.read(1024*8)
-        print return_value
+	# 4k buffer equals to 2 standard console (80x25) pages.
+	return_value = pipe.read(4096)
 	smsg(type, source, unicode(return_value, 'utf8'))
 
 register_command_handler(handler_python_eval, '!eval', 100, 'Evaluates and returns a Python expression.', '!eval <expression>', ['!eval 1+1'])

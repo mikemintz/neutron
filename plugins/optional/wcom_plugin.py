@@ -17,7 +17,7 @@ def handler_wcom(type, source, parameters):
         param = 'UKXX0010'
         title = '\n*** Wrong format, falling back ***\n'			
     try:
-	    response = urlopen('http://xoap.weather.com/weather/local/'+param+'?cc=*&dayf=1&unit=m' ,proxies=proxies)
+        response = urlopen('http://xoap.weather.com/weather/local/'+param+'?cc=*&dayf=1&unit=m', proxies=proxies)
     except:
         print "Unexpected error:", exc_info()[0]
 	

@@ -149,9 +149,9 @@ def handler_mueller(type, source, parameters):
 	reply = decode_charrefs(return_value, 'koi8-r')
 	smsg(type, source, reply)
 
-register_command_handler(handler_mueller, '!mueller', 0, 'Translates a word from english to russian using local mueller dictionary', '!mueller <word>', ['!mueller sex'])
+register_command_handler(handler_mueller, '!mueller', 0, 'Translates a word from english to russian using local mueller dictionary', '!mueller <word>', ['!mueller word'])
 
-register_command_handler(handler_mueller, '!m', 0, 'Translates a word from english to russian using local mueller dictionary', '!m <word>', ['!m sex'])
+register_command_handler(handler_mueller, '!m', 0, 'Translates a word from english to russian using local mueller dictionary', '!m <word>', ['!m word'])
 
 register_command_handler(handler_babel_babel, '!babel', 0, 'Translate a phrase from one language to another using AltaVista BabelFish.', '!babel <fromlang> <tolang> <phrase>', ['!babel english spanish hello', '!babel fr en bonjour'])
 
