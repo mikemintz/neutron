@@ -1,0 +1,22 @@
+{
+'account.COUNT' : '3',
+
+'account.SERVER[1]' : 'jabber.orgg',
+'account.PORT[1]' : '5222',
+'account.USERNAME[1]' : 'Neutron',
+'account.PASSWORD[1]' : 'password',
+'account.RESOURCE[1]': 'neutron' + str(random.randrange(1000, 9999)),
+
+'account.SERVER[2]' : 'jabber.org.nzg',
+'account.PORT[2]' : '5222',
+'account.USERNAME[2]' : 'Neutron',
+'account.PASSWORD[2]' : 'password',
+'account.RESOURCE[2]': 'neutron' + str(random.randrange(1000, 9999)),
+
+'account.SERVER[3]' : 'jaim.atg',
+'account.PORT[3]' : '5222',
+'account.USERNAME[3]' : 'Neutron',
+'account.PASSWORD[3]' : 'password',
+'account.RESOURCE[3]': 'neutron' + str(random.randrange(1000, 9999)),
+
+}
