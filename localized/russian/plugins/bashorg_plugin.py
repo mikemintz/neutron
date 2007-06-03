@@ -33,7 +33,7 @@ def handler_bashorgru_get(type, source, parameters):
         target = r.read()
         od = re.search('<div>',target)
         message = target[od.end():]
-        message = message[:re.search('<div>',message).start()]
+        message = message[:re.search('</div>',message).start()]
         message = decode(message)
         message = '\n' + message.strip()
         smsg(type,source,unicode(message,'windows-1251'))
