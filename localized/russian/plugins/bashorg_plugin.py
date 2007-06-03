@@ -24,16 +24,16 @@ def handler_bashorg_get(type, source, parameters):
 
 def handler_bashorgru_get(type, source, parameters):
     if parameters.strip()=='':
-        req = urllib2.Request('http://bash.org.ru/quote.php')
+        req = urllib2.Request('http://bash.org.ru/random')
     else:
-        req = urllib2.Request('http://bash.org.ru/quote.php?num='+parameters.strip())
+        req = urllib2.Request('http://bash.org.ru/quote/'+parameters.strip())
     req.add_header = ('User-agent', 'Mozilla/5.0')
     try:
         r = urllib2.urlopen(req)
         target = r.read()
-        od = re.search('<td class="dat">',target)
+        od = re.search('<div>',target)
         message = target[od.end():]
-        message = message[:re.search('</td>',message).start()]
+        message = message[:re.search('<div>',message).start()]
         message = decode(message)
         message = '\n' + message.strip()
         smsg(type,source,unicode(message,'windows-1251'))
@@ -102,7 +102,7 @@ def handler_linuxorgru_get(type, source, parameters):
     smsg(type, source, unicode(message, 'koi8-r'))
 
 def decode(text):
-    return strip_tags.sub('', text.replace('<br>','\n')).replace('&nbsp;', ' ').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"')
+    return strip_tags.sub('', text.replace('<br>','\n')).replace('&nbsp;', ' ').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('<br />','\r\n')
 
 register_command_handler(handler_bashorg_get, '!bo', 0, 'Get quote from bash.org', '!bo', ['!bo 22'])
 register_command_handler(handler_bashorg_get, '!bashorg', 0, 'Get quote from bash.org', '!bashorg', ['!bashorg 22'])
