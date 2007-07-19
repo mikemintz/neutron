@@ -8,7 +8,7 @@
 ## (at your option) any later version.
 
 # Modified by me :) Gh0st AKA Bohdan Turkynewych
-import os, xmpp, time
+import os, xmpp, time, sys
 
 messages=None
 global version
@@ -54,9 +54,11 @@ def versionCB(conn, iq_obj):
     uname=os.popen("uname -sr", 'r')
     osver=uname.read().strip()
     uname.close()
-    pipe = os.popen('sh -c ' + '"' + 'python -V 2>&1' + '"')
-    python_ver = pipe.read(1024).strip()
-    osver = osver + ' ' + python_ver
+    uname=os.popen("uname -mp", 'r')
+    machver=uname.read().strip()
+    uname.close()
+    python_ver = 'Python: ' + sys.version.split(' ')[0]
+    osver = osver + ' ' + python_ver + ' on ' + machver
     iq_obj=iq_obj.buildReply('result')
     qp=iq_obj.getTag('query')
     qp.setTagData('name', vername)
