@@ -80,6 +80,3 @@ class Googlep:
 	results = self.google_search(parameters + ' site:www.jabber.org "/jeps/jep-" -jeplist.html')
 	self.conn.smsg(type, source, results)
 
-#register_command_handler(
-#register_command_handler(
-#register_command_handler(

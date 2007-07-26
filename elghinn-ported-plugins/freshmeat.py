@@ -51,4 +51,3 @@ class Freshmeat:
         # This was really stupid typo...
 	self.conn.smsg(type, source, reply)
 
-#register_command_handler(handler_fm, '!fm', 0, 'Gives information about program from FreshMeat.net', '!fm program', ['!fm Gajim', '!fm xmpppy'])
