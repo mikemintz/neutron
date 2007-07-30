@@ -66,7 +66,7 @@ def handler_admin_uptime(type, source, parameters):
 def handler_admin_rooms(type, source, parameters):
 	initialize_file(GROUPCHAT_CACHE_FILE, '[]')
 	groupchats = eval(read_file(GROUPCHAT_CACHE_FILE))
-        reply = '\n'.join(groupchats)
+        reply = '\nTotal Rooms: '+ str(len(groupchats)) + '\n' + '\n'.join(groupchats)
 	smsg(type, source, reply)
 
 
