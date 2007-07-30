@@ -1,7 +1,7 @@
 # -*- coding: koi8-u -*-
 
 #  Neutron plugin
-#  google_plugin.py
+#  functions.py
 
 #  Copyright (C) 2002-2006 Mike Mintz <mikemintz@gmail.com>
 #  Copyright (C) 2007 Mike Mintz <mikemintz@gmail.com>
