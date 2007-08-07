@@ -259,22 +259,27 @@ def find_plugins():
 	return valid_plugins
 
 def load_plugins():
+	plugins_count = 0
 	valid_plugins = find_plugins()
+	total_plugins = len(valid_plugins)
 	ErrMsg = ''
 	for valid_plugin in valid_plugins:
 		try:
 			#execfile(PLUGIN_DIR + '/' + valid_plugin)
 			fp = file(PLUGIN_DIR + '/' + valid_plugin)
 			ErrMsg = printc(color_bright_green,' Ok.')
+			plugins_count += 1
 			try:
 			    exec fp in globals()
 			except:
 			    ErrMsg = printc(color_bright_red, ' Load Error. Check plugin.')
+			    plugins_count = plugins_count - 1
 			    pass    
 			fp.close()
 			print printc(color_green,'Plugin: ') + printc(color_yellow,valid_plugin) + ErrMsg
 		except:
 			raise
+	print printc(color_magenta, 'Total plugins: ' + str(total_plugins) + ', '+ str(plugins_count) + ' plugins loaded.')		
 
 def load_initscript():
 	print printc(color_white, 'Executing Init Script')
