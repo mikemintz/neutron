@@ -21,8 +21,6 @@ import irclib
 import urllib
 import urllib2
 #
-import aiml
-#
 import iq
 
 ################################################################################
@@ -400,7 +398,11 @@ def isadmin(jid):
 
 def messageCB(con, msg):
 	msgtype = msg.getType()
-	body = msg.getBody().strip()
+	try:
+    	    body = msg.getBody().strip()
+	except:
+	    body = ''
+	    pass    
 	fromjid = msg.getFrom()
 	command = ''
 	parameters = ''
@@ -467,22 +469,6 @@ def dcCB():
 		os.execl(sys.executable, sys.executable, sys.argv[0])
 	else:
 		sys.exit(0)
-
-def load_aiml():
-    global k
-    # The Kernel object is the public interface to
-    # the AIML interpreter.
-    k = aiml.Kernel()
-
-    # Use the 'learn' method to load the contents
-    # of an AIML file into the Kernel.
-    k.learn("std-startup.xml")
-
-    # Use the 'respond' method to compute the response
-    # to a user's input string.  respond() returns
-    # the interpreter's response, which in this case
-    # we ignore.
-    k.respond("load aiml b")
 
 ################################################################################
 
