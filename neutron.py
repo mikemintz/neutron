@@ -224,13 +224,20 @@ def find_plugins():
 
 def load_plugins():
 	valid_plugins = find_plugins()
+	ErrMsg = ''
 	for valid_plugin in valid_plugins:
 		try:
-			print 'Plugin: ' + valid_plugin
+			#print 'Plugin: ' + valid_plugin
 			#execfile(PLUGIN_DIR + '/' + valid_plugin)
 			fp = file(PLUGIN_DIR + '/' + valid_plugin)
-			exec fp in globals()
+			ErrMsg = ' Ok.'
+			try:
+			    exec fp in globals()
+			except:
+			    ErrMsg = ' Load Error. Check plugin.'
+			    pass    
 			fp.close()
+			print 'Plugin: ' + valid_plugin + ErrMsg
 		except:
 			raise
 
