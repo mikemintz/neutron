@@ -90,22 +90,22 @@ def rss_query_channels():
 	global RSS_CACHE
 	global last_query
 	if time.time() > last_query + (RSS_INTERVAL * 60):
-		print 'Querying Channels'
+		print printc(color_blue,'Querying Channels')
 		last_query = time.time()
 		for channel in RSS_CACHE['channels']:
 			rss_query_channel(channel)
 			time.sleep(RSS_QUERY_DELAY)
-		print 'Finished Querying Headlines'
+		print printc(color_blue,'Finished Querying Headlines')
 
 def rss_query_channel(channel):
-	print 'Querying: "' + channel + '"'
+	print printc(color_blue,'Querying: ') + '"' + channel + '"'
 	parser = make_parser()
 	parser.setContentHandler(RSSHandler(channel))
 	try:
 		parser.parse(RSS_CACHE['channels'][channel]['url'])
 	except:
 		#raise
-		print 'error parsing: ' + channel
+		print printc(color_bright_red,'error parsing: ') + channel
 
 def rss_dispatch_headlines(channel, info, items):
 	global RSS_CACHE
@@ -133,7 +133,7 @@ def rss_dispatch_headline(channel, item):
 	reply += link
 	for groupchat in RSS_CACHE['channels'][channel]['subscribers']:
 		if GROUPCHATS.has_key(groupchat):
-			print channel + ': Sending Headline To: ' + groupchat
+			print printc(color_yellow,channel) + ': Sending Headline To: ' + printc(color_gray,groupchat)
 			msg(groupchat, reply)
 
 ################################################################################

@@ -35,7 +35,8 @@ def handler_pyaiml(type, source, body):
 
 # Uncomment this if you want PyAIML support.
 # Note: sessions are still not implemented.
-register_message_handler(handler_pyaiml)
+#register_message_handler(handler_pyaiml)
 
 if __name__ == "__main__":
-	load_aiml()
+	#load_aiml()
+	pass

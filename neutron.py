@@ -7,6 +7,7 @@ os.chdir(os.path.dirname(sys.argv[0]))
 sys.path.insert(1, 'modules')
 
 import xmpp
+from xmpp.debug import *
 import string
 import time
 import thread
@@ -72,6 +73,28 @@ if HTTP_PROXY != "":
 else:
     proxies = {}
 # end of addition
+
+# Parts of code from modules/xmpp/debug.py
+# Wanna some colors :)
+color_none         = chr(27) + "[0m"
+color_black        = chr(27) + "[30m"
+color_red          = chr(27) + "[31m"
+color_green        = chr(27) + "[32m"
+color_brown        = chr(27) + "[33m"
+color_blue         = chr(27) + "[34m"
+color_magenta      = chr(27) + "[35m"
+color_cyan         = chr(27) + "[36m"
+color_light_gray   = chr(27) + "[37m"
+color_dark_gray    = chr(27) + "[30;1m"
+color_bright_red   = chr(27) + "[31;1m"
+color_bright_green = chr(27) + "[32;1m"
+color_yellow       = chr(27) + "[33;1m"
+color_bright_blue  = chr(27) + "[34;1m"
+color_purple       = chr(27) + "[35;1m"
+color_bright_cyan  = chr(27) + "[36;1m"
+color_white        = chr(27) + "[37;1m"
+
+#
 BOOTUP_TIMESTAMP = time.time()
 
 ################################################################################
@@ -98,6 +121,19 @@ CONFIGURATION = {}
 
 ################################################################################
 
+if os.environ.has_key('TERM'):
+    colors_enabled=True
+else:
+    colors_enabled=False
+
+def printc(prefix, msg):
+    msg=msg.replace('\r','\\r').replace('\n','\\n').replace('><','>\n  <')
+    if colors_enabled: 
+        msg=prefix+msg+color_none
+    else:
+        msg=color_none+msg
+    return msg
+    
 optlist, args = getopt.getopt(sys.argv[1:], '', ['pid='])
 for opt_tuple in optlist:
 	if opt_tuple[0] == '--pid':
@@ -132,7 +168,7 @@ initialize_file(CONFIGURATION_FILE, '{}')
 try:
 	CONFIGURATION = eval(read_file(CONFIGURATION_FILE))
 except:
-	print 'Error Parsing Configuration File'
+	print printc(color_bright_red,'Error Parsing Configuration File')
 
 def config_get(category, key):
 	if CONFIGURATION.has_key(category):
@@ -227,22 +263,21 @@ def load_plugins():
 	ErrMsg = ''
 	for valid_plugin in valid_plugins:
 		try:
-			#print 'Plugin: ' + valid_plugin
 			#execfile(PLUGIN_DIR + '/' + valid_plugin)
 			fp = file(PLUGIN_DIR + '/' + valid_plugin)
-			ErrMsg = ' Ok.'
+			ErrMsg = printc(color_bright_green,' Ok.')
 			try:
 			    exec fp in globals()
 			except:
-			    ErrMsg = ' Load Error. Check plugin.'
+			    ErrMsg = printc(color_bright_red, ' Load Error. Check plugin.')
 			    pass    
 			fp.close()
-			print 'Plugin: ' + valid_plugin + ErrMsg
+			print printc(color_green,'Plugin: ') + printc(color_yellow,valid_plugin) + ErrMsg
 		except:
 			raise
 
 def load_initscript():
-	print 'Executing Init Script'
+	print printc(color_white, 'Executing Init Script')
 	fp = file(INITSCRIPT_FILE)
 	exec fp in globals()
 	fp.close()
@@ -286,7 +321,7 @@ def get_nick(groupchat):
 		fp.write('{}')
 		fp.close()
 		nicks_string = '{}'
-		print 'Initializing ' + NICKS_CACHE_FILE
+		print printc(color_yellow,'Initializing ') + NICKS_CACHE_FILE
 	nicks = eval(nicks_string)
 	if nicks.has_key(groupchat):
 		return nicks[groupchat]
@@ -468,11 +503,11 @@ def iqCB(con, iq):
 	    call_iq_handlers(iq)
 
 def dcCB():
-	print 'DISCONNECTED'
+	print printc(color_bright_blue, 'DISCONNECTED')
 	if AUTO_RESTART:
-		print 'WAITING FOR RESTART...'
+		print printc(color_dark_gray,'WAITING FOR RESTART...')
 		time.sleep(240) # sleep for 240 seconds
-		print 'RESTARTING'
+		print printc(color_light_gray, 'RESTARTING')
 		os.execl(sys.executable, sys.executable, sys.argv[0])
 	else:
 		sys.exit(0)
@@ -490,15 +525,16 @@ def start():
 	load_initscript()
 
 	if JCON.connect():
-		print "Connected"
+		print printc(color_bright_green,"Connected")
+		
 	else:
-		print "Couldn't connect"
+		print printc(color_bright_red,"Couldn't connect")
 		sys.exit(1)
 
 	if JCON.auth(USERNAME, PASSWORD, RESOURCE):
-		print 'Logged In'
+		print printc(color_white,'Logged In')
 	else:
-		print "eek -> ", JCON.lastErr, JCON.lastErrCode
+		print printc(color_bright_red,"Auth error: eek -> "), JCON.lastErr, JCON.lastErrCode
 		time.sleep(10) # sleep for 10 seconds
 		sys.exit(1)
 
@@ -520,12 +556,14 @@ def start():
 
 	JCON.getRoster()
 	JCON.sendInitPresence()
-	print 'Presence Sent'
+	print printc(color_yellow,'Presence Sent')
 
 	initialize_file(GROUPCHAT_CACHE_FILE, '[]')
 	groupchats = eval(read_file(GROUPCHAT_CACHE_FILE))
 	for groupchat in groupchats:
 		join_groupchat(groupchat)
+		# Yes, it slows down bot a little,
+		# but avoid too heavy load and some tracebacks
 		time.sleep(0.5)
 
 	while 1:
@@ -535,7 +573,7 @@ if __name__ == "__main__":
 	try:
 		start()
 	except KeyboardInterrupt:
-		print '\nINTERUPT'
+		print printc(color_cyan,'INTERUPT')
 		sys.exit(1)
 	except:
 		if AUTO_RESTART:
@@ -549,9 +587,9 @@ if __name__ == "__main__":
 			try:
 				time.sleep(3)
 			except KeyboardInterrupt:
-				print '\nINTERUPT'
+				print printc(color_cyan,'INTERUPT')
 				sys.exit(1)
-			print 'RESTARTING'
+			print printc(color_cyan,'RESTARTING')
 			os.execl(sys.executable, sys.executable, sys.argv[0])
 		else:
 			raise

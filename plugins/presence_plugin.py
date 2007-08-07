@@ -7,9 +7,11 @@ def handler_presence_presence(prs):
 		type = 'available'
 	if type == 'subscribe':
 		JCON.send(xmpp.Presence(to=who, typ='subscribed'))
+		msg(who, 'Thanks for adding into your contacts.\ntype !commands to get list of available functionality.\nWBR, Neutron Bot.')
 		#JCON.send(xmpp.Presence(to=who, typ='subscribe'))
 	elif type == 'unsubscribe':
 		JCON.send(xmpp.Presence(to=who, typ='unsubscribed'))
+		msg(who, 'Why are you killing me?\nAt least, we were together ;-)\nWBR, Neutron Bot.')
 		#JCON.send(xmpp.Presence(to=who, typ='unsubscribe'))
 	elif type == 'subscribed':
 		pass
