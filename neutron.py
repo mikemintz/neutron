@@ -7,7 +7,6 @@ os.chdir(os.path.dirname(sys.argv[0]))
 sys.path.insert(1, 'modules')
 
 import xmpp
-from xmpp.debug import *
 import string
 import time
 import thread
