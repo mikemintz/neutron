@@ -3,6 +3,7 @@
 def handler_python_eval(type, source, parameters):
 	try:
 		return_value = str(eval(parameters))
+		time.sleep(3)
 	except:
 		return_value = str(sys.exc_info()[0]) + ' - ' + str(sys.exc_info()[1])
 	smsg(type, source, return_value)
@@ -12,6 +13,7 @@ def handler_python_exec(type, source, parameters):
 		parameters += '\n'
 	try:
 		exec parameters in globals()
+		time.sleep(3)
 		return_value = 'Successful Execution'
 	except:
 		return_value = str(sys.exc_info()[0]) + ' - ' + str(sys.exc_info()[1])

@@ -3,7 +3,7 @@
 # Author: bloody
 
 import urllib2,re,time
-def prog_grab(code):
+def prog_grabru(code):
 	
 		kod=code.lower()
 		req = urllib2.Request('http://tv.yandex.ru/?mode=print&channel='+kod)
@@ -17,7 +17,7 @@ def prog_grab(code):
 			   
                 return program
 
-def prog_list():
+def prog_listru():
 	
 		req = urllib2.Request('http://tv.yandex.ru/')
 		r = urllib2.urlopen(req)
@@ -29,11 +29,11 @@ def prog_list():
                 return program
 
 
-def handler_TV_get(type, source, parameters):
-	smsg(type,source,unicode(prog_grab(parameters),'windows-1251'))
-def handler_TV_list(type, source, parameters):
-	smsg(type,source,unicode(prog_list(),'windows-1251'))	
+def handler_TVru_get(type, source, parameters):
+	smsg(type,source,unicode(prog_grabru(parameters),'windows-1251'))
+def handler_TVru_list(type, source, parameters):
+	smsg(type,source,unicode(prog_listru(),'windows-1251'))	
 	
 
-register_command_handler(handler_TV_get, '!tv', 0, 'Returns TV program for given channel.', '!tv <channel>', ['!tv ct1'])
-register_command_handler(handler_TV_list, '!tv_list', 0, 'Returns TV program for given channel.', '!tv_list', ['!tv_list'])
+register_command_handler(handler_TVru_get, '!tvru', 0, 'Returns TV program for given channel.', '!tv <channel>', ['!tv ct1'])
+register_command_handler(handler_TVru_list, '!tvru_list', 0, 'Returns TV program for given channel.', '!tv_list', ['!tv_list'])

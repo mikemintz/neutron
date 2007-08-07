@@ -36,8 +36,8 @@ def prog_grab(code):
 		return vystup
 
 
-def handler_TV_get(type, source, parameters):
+def handler_TVen_get(type, source, parameters):
 	smsg(type,source,unicode(prog_grab(parameters),'windows-1250'))
 	
 
-register_command_handler(handler_TV_get, '!tv', 0, 'Returns TV program for given channel.', '!tv <channel>', ['!tv ct1'])
+register_command_handler(handler_TVen_get, '!tven', 0, 'Returns TV program for given channel.', '!tv <channel>', ['!tv ct1'])
