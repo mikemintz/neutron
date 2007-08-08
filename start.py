@@ -19,7 +19,11 @@ def pyc_cleanup():
 	for line in lines.split('\n'):
 	    if line.strip():
 		print line
-		os.remove(line)
+		try:
+		    os.remove(line)
+		except:
+		    print 'Check permissions and/or FS.'
+		    raise
 		lines_count += 1
 	s = str(lines_count)	
     print 'Done. %s file(s) removed'%s
