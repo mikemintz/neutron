@@ -40,6 +40,34 @@ def handler_bashorgru_get(type, source, parameters):
     except:
         smsg(type,source,unicode('Кончился интернет, всё, приехали... ','koi8-u'))
 
+def handler_irclv_get(type, source, parameters):
+    if parameters.strip()=='':
+        parameters = '105090'
+    else:
+	pass
+    req = urllib2.Request('http://irc.lv/qna/view?question_id='+parameters.strip())
+    req.add_header = ('User-agent', 'Mozilla/5.0')
+    try:
+        r = urllib2.urlopen(req)
+        target = r.read()
+        od = re.search('<div class="qtopic">',target)
+        message = target[od.end():]
+        message = message[:re.search('<div class="folders"><span class="topic">',message).start()]
+        message = decode(message)
+        message = '\n' + message.strip()
+	question = message
+	od = re.search('<span class="topic">',target)
+        message = target[od.end():]
+        message = message[:re.search('<span class="topic">',message).start()]
+        message = decode(message)
+        message = '\n' + message.strip()
+	answer = message
+	reply = question + '\n' + answer
+        smsg(type,source,unicode(reply,'utf-8'))
+    except:
+	print printc(color_white, str(sys.exc_info()[0].__name__) + ' -- ' + str(sys.exc_info()[1]))
+        smsg(type,source,unicode('Кончился интернет, всё, приехали... ','koi8-u'))
+
 def handler_linuxorgru_get(type, source, parameters):
     req = urllib2.Request('http://linux.org.ru/index.jsp')
     req.add_header = ('User-agent', 'Mozilla/5.0')
@@ -102,12 +130,13 @@ def handler_linuxorgru_get(type, source, parameters):
     smsg(type, source, unicode(message, 'koi8-r'))
 
 def decode(text):
-    return strip_tags.sub('', text.replace('<br>','\n')).replace('&nbsp;', ' ').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('<br />','\r\n')
+    return strip_tags.sub('', text.replace('<br>','\n')).replace('&nbsp;', ' ').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('<br />','\n')
 
 register_command_handler(handler_bashorg_get, '!bo', 0, 'Get quote from bash.org', '!bo', ['!bo 22'])
 register_command_handler(handler_bashorg_get, '!bashorg', 0, 'Get quote from bash.org', '!bashorg', ['!bashorg 22'])
 register_command_handler(handler_bashorgru_get, '!bor', 0, 'Get quote from bash.org.ru', '!bor', ['!bor 22'])
 register_command_handler(handler_bashorgru_get, '!bashorgru', 0, 'Get quote from bash.org.ru', '!bashorgru', ['!bashorgru 22'])
+register_command_handler(handler_irclv_get, '!irclv', 0, 'Get quote from irc.lv', '!irclv', ['!irclv 105005'])
 register_command_handler(handler_linuxorgru_get, '!lor', 0, 'Get latest news post from linux.org.ru. Note: Parameters ignored.', '!lor', ['!lor 22'])
 register_command_handler(handler_pyorg_get, '!pyorg', 0, 'Get latest news post from python.org. Note: Parameters ignored.', '!pyorg', ['!lor 22'])
 register_command_handler(handler_bbc_get, '!bbc', 0, 'Get latest news post from BBC in Russian. Note: Parameters ignored.', '!bbc', ['!bbc 22'])
