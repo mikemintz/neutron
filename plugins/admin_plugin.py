@@ -38,12 +38,14 @@ def handler_admin_say(type, source, parameters):
 def handler_admin_restart(type, source, parameters):
 	#os.startfile(sys.argv[0])
 	smsg(type, source, 'Restarting')
+	print printc(color_bright_red, 'Received !restart from remote.')
 	JCON.disconnect()
 	os.execv('./neutron.py', sys.argv)
 
 def handler_admin_exit(type, source, parameters):
 	#os.startfile(sys.argv[0])
 	smsg(type, source, 'Exiting')
+	print printc(color_bright_red, 'Received !exit from remote.')
 	JCON.disconnect()
 	os.abort()
 
