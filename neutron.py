@@ -306,6 +306,7 @@ def get_true_jid(jid):
 			true_jid = stripped_jid
 	else:
 		true_jid = stripped_jid
+	print printc(color_white, 'Debug: ' + str(true_jid))	
 	return true_jid
 	
 def get_groupchat(jid):
