@@ -273,7 +273,6 @@ def load_plugins():
 			except:
 			    ErrMsg = printc(color_bright_red, ' Load Error. Check plugin.')
 			    ErrMsg += '\r\nReason: '+ str(sys.exc_info()[0].__name__)+ ':\r\n' + str(sys.exc_info()[1])
-			    
 			    plugins_count = plugins_count - 1
 			    pass    
 			fp.close()
