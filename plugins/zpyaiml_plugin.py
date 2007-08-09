@@ -21,7 +21,7 @@ def load_aiml():
     k.respond("load aiml b")
 
 def chat_pyaiml(type, source, body):
-    reply = k.respond(body)
+    reply = k.respond(body, get_true_jid(source))
     smsg(type, source, reply)
     
 def handler_pyaiml(type, source, body):
