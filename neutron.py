@@ -399,7 +399,10 @@ def join_groupchat(groupchat, nick=None):
 		set_nick(groupchat, nick)
 	else:
 		nick = get_nick(groupchat)
-	JCON.send(xmpp.Presence(groupchat + '/' + nick))
+	presence=xmpp.protocol.Presence('%s/%s'%(groupchat, nick))
+	presence.setStatus('Neutron bot is up and running, ready for serving requests.')
+	presence.setTag('x',namespace=xmpp.NS_MUC).addChild('history',{'maxchars':'0','maxstanzas':'0'})
+	JCON.send(presence)
 	if not GROUPCHATS.has_key(groupchat):
 		GROUPCHATS[groupchat] = {}
 		write_file(GROUPCHAT_CACHE_FILE, str(GROUPCHATS.keys()))
@@ -598,6 +601,9 @@ if __name__ == "__main__":
 			print printc(color_cyan,'RESTARTING')
 			os.execl(sys.executable, sys.executable, sys.argv[0])
 		else:
+			crashfile = file('crash.log', 'w')
+			traceback.print_exc(limit=None, file=crashfile)
+			crashfile.close()
 			raise
 
 #EOF
