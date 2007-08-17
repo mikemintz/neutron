@@ -2,8 +2,8 @@
 
 import httplib
 
-UPDATE_HOST = 'www.jabber.ru'
-UPDATE_PATH = '/projects/neutron/files/'
+UPDATE_HOST = 'svn.hypothetic.org'
+UPDATE_PATH = '/neutron/branches/gh0st-dev/'
 
 VERSIONS_FILE = 'dynamic/versions.txt'
 
@@ -56,4 +56,5 @@ def handler_update_update(type, source, parameters):
 	write_file(VERSIONS_FILE, str(my_versions))
 	smsg(type, source, 'Neutron is now completely up to date. Finished')
 
-register_command_handler(handler_update_update, '!update', 100, 'Updates Neutron from Internet.', '!update', ['!update'])
+# Note: Not tested. Please, think twice before uncommenting line below. You have been warned.
+#register_command_handler(handler_update_update, '!update', 100, 'Updates Neutron from Internet.', '!update', ['!update'])
