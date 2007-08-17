@@ -40,6 +40,24 @@ def handler_bashorgru_get(type, source, parameters):
     except:
         smsg(type,source,unicode('Кончился интернет, всё, приехали... ','koi8-u'))
 
+def handler_ostrie_get(type, source, parameters):
+    if parameters.strip()=='':
+        req = urllib2.Request('http://ostrie.moskva.com/?do=TopToday')
+    else:
+        req = urllib2.Request('http://ostrie.moskva.com/?do=Item&id='+parameters.strip())
+    req.add_header = ('User-agent', 'Mozilla/5.0')
+    try:
+        r = urllib2.urlopen(req)
+        target = r.read()
+        od = re.search('<dd>',target)
+        message = target[od.end():]
+        message = message[:re.search('<div class="instr">',message).start()]
+        message = decode(message)
+        message = '\n' + message.strip()
+        smsg(type,source,unicode(message,'koi8-r'))
+    except:
+        smsg(type,source,unicode('Кончился интернет, всё, приехали... ','koi8-u'))
+
 def handler_irclv_get(type, source, parameters):
     if parameters.strip()=='':
         parameters = '105090'
@@ -137,6 +155,7 @@ register_command_handler(handler_bashorg_get, '!bashorg', 0, 'Get quote from bas
 register_command_handler(handler_bashorgru_get, '!bor', 0, 'Get quote from bash.org.ru', '!bor', ['!bor 22'])
 register_command_handler(handler_bashorgru_get, '!bashorgru', 0, 'Get quote from bash.org.ru', '!bashorgru', ['!bashorgru 22'])
 register_command_handler(handler_irclv_get, '!irclv', 0, 'Get quote from irc.lv', '!irclv', ['!irclv 105005'])
+register_command_handler(handler_ostrie_get, '!ost', 0, 'Get quote from ostrie.ru', '!ost', ['!ost 838923'])
 register_command_handler(handler_linuxorgru_get, '!lor', 0, 'Get latest news post from linux.org.ru. Note: Parameters ignored.', '!lor', ['!lor 22'])
 register_command_handler(handler_pyorg_get, '!pyorg', 0, 'Get latest news post from python.org. Note: Parameters ignored.', '!pyorg', ['!lor 22'])
 register_command_handler(handler_bbc_get, '!bbc', 0, 'Get latest news post from BBC in Russian. Note: Parameters ignored.', '!bbc', ['!bbc 22'])
