@@ -72,6 +72,16 @@ def handler_admin_rooms(type, source, parameters):
 	smsg(type, source, reply)
 
 
+def handler_admin_rejoinall(type, source, parameters):
+	initialize_file(GROUPCHAT_CACHE_FILE, '[]')
+	groupchats = eval(read_file(GROUPCHAT_CACHE_FILE))
+	smsg(type, source, 'Rejoining *ALL* groupchats.')
+	for groupchat in groupchats:
+		leave_groupchat(groupchat)
+		time.sleep(0.5)
+		join_groupchat(groupchat)
+		
+
 register_command_handler(handler_admin_join, '!join', 100, 'Joins specified groupchat.', '!join <groupchat> [nick]', ['!join jabber@conference.jabber.org', '!join jdev@conference.jabber.org neutron2'])
 register_command_handler(handler_admin_leave, '!leave', 100, 'Joins specified (or current) groupchat.', '!leave [groupchat]', ['!leave jabber@conference.jabber.org', '!leave'])
 register_command_handler(handler_admin_msg, '!msg' ,100, 'Sends a message to specified JID.', '!msg <jid> <message>', ['!msg mikem@jabber.org hey mike!'])
@@ -80,5 +90,6 @@ register_command_handler(handler_admin_restart, '!restart', 100, 'Restarts me.',
 register_command_handler(handler_admin_exit, '!exit', 100, 'Exits completely.', '!exit', ['!exit'])
 register_command_handler(handler_admin_uptime, '!uptime', 100, 'Returns Neutron uptime.', '!uptime', ['!uptime'])
 register_command_handler(handler_admin_rooms, '!rooms', 100, 'Returns Neutron\'s rooms.', '!rooms', ['!rooms'])
+register_command_handler(handler_admin_rejoinall, '!rejoinall', 100, 'Rejoins *ALL* Neutron\'s rooms.', '!rejoinall', ['!rejoinall'])
 
 register_groupchat_invite_handler(admin_groupchat_invite_handler)
