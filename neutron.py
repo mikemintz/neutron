@@ -521,16 +521,35 @@ def dcCB():
 	else:
 		sys.exit(0)
 
+def join_groupchats():
+	initialize_file(GROUPCHAT_CACHE_FILE, '[]')
+	groupchats = eval(read_file(GROUPCHAT_CACHE_FILE))
+	for groupchat in groupchats:
+		join_groupchat(groupchat)
+		# Yes, it slows down bot a little,
+		# but avoid too heavy load and some tracebacks
+		time.sleep(0.5)
+
+def write_crashlog():
+    	crashfile = file('crash.log', 'w')
+	traceback.print_exc(limit=None, file=crashfile)
+	crashfile.close()
+		
 ################################################################################
 
 def start():
 	global JCON
+	global LOGGEDIN
+	LOGGEDIN = 0
 	JCON = xmpp.Client(server=SERVER, port=PORT, debug=[])
 
 	get_access_levels()
-	load_plugins()
-	# Uncomment if you want PyAIML support.
-	# load_aiml()
+
+	# Loading of plugins moved below, after logging in succeeded.
+	# Reason: Some of some has to have *existing* JCON,
+	# ie being already connected, like sending notifications, and so on.
+	# load_plugins()
+
 	load_initscript()
 
 	if JCON.connect():
@@ -567,19 +586,18 @@ def start():
 	JCON.sendInitPresence()
 	print printc(color_yellow,'Presence Sent')
 
-	initialize_file(GROUPCHAT_CACHE_FILE, '[]')
-	groupchats = eval(read_file(GROUPCHAT_CACHE_FILE))
-	for groupchat in groupchats:
-		join_groupchat(groupchat)
-		# Yes, it slows down bot a little,
-		# but avoid too heavy load and some tracebacks
-		time.sleep(0.5)
+	LOGGEDIN = 1
+
+	# New place of this function.
+	load_plugins()
+
+	join_groupchats()	
 
 	while 1:
 		JCON.Process(10)
 
 if __name__ == "__main__":
-	try:
+	try:	
 		start()
 	except KeyboardInterrupt:
 		print printc(color_cyan,'INTERUPT')
@@ -601,9 +619,7 @@ if __name__ == "__main__":
 			print printc(color_cyan,'RESTARTING')
 			os.execl(sys.executable, sys.executable, sys.argv[0])
 		else:
-			crashfile = file('crash.log', 'w')
-			traceback.print_exc(limit=None, file=crashfile)
-			crashfile.close()
+			write_crashlog()
 			raise
 
 #EOF
