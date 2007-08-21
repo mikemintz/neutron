@@ -80,7 +80,19 @@ def handler_admin_rejoinall(type, source, parameters):
 		leave_groupchat(groupchat)
 		time.sleep(0.5)
 		join_groupchat(groupchat)
-		
+
+def admin_crashlog():
+	initialize_file('crash.log','')
+	data = read_file('crash.log')
+	if data.strip():
+	    data = 'Last crashlog:\n\n' + data
+	    for admin in ADMINS:
+		msg(admin.strip(), data)
+
+if __name__ == "__main__":
+	# Notify bot admins with
+	# last crashlog file.
+	admin_crashlog()		
 
 register_command_handler(handler_admin_join, '!join', 100, 'Joins specified groupchat.', '!join <groupchat> [nick]', ['!join jabber@conference.jabber.org', '!join jdev@conference.jabber.org neutron2'])
 register_command_handler(handler_admin_leave, '!leave', 100, 'Joins specified (or current) groupchat.', '!leave [groupchat]', ['!leave jabber@conference.jabber.org', '!leave'])
