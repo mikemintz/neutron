@@ -1,5 +1,8 @@
 #$ neutron_plugin 01
 
+from socket import *
+import struct
+
 def handler_time_date(type, source, parameters):
 	reply = time.strftime('%a %d %b %H:%M:%S UTC %Y', time.gmtime())
 	smsg(type, source, reply)
@@ -19,5 +22,35 @@ def handler_time_swatch(type, source, parameters):
 	reply = '@' + prefix + str(round(beats, 2))	
 	smsg(type, source, reply)
 
+# Modified by Gh0st, AKA Bohdan Turkynewych
+
+
+# Based on Simon Foster's simple SNTP client from ASPN Python cookbook.
+# Adapted by Paul Rubin; this script lives at:
+#    http://www.nightsong.com/phr/python/setclock.py
+
+
+def handler_time_ntptime(type, source, parameters):
+    reply = ''
+    time_server = (gethostbyname('pool.ntp.org'), 123)
+    TIME1970 = 2208988800L      # Thanks to F.Lundh
+    client = socket( AF_INET, SOCK_DGRAM )
+    data = '\x1b' + 47 * '\0'
+    client.sendto(data, time_server)
+    data, address = client.recvfrom( 1024 )
+    if data:
+	reply = 'Response received from ' + str(address[0]) + '\n'
+	t = struct.unpack( '!12I', data )[10]
+	if t == 0:
+    	    reply = 'invalid response'
+	ct = time.asctime(time.gmtime(t - TIME1970))
+	reply += 'Current time (GMT/UTC): ' + str(ct)
+    else:
+	reply =  'no data returned'
+    smsg(type, source, reply)
+
+# end of setclock.py
+
+register_command_handler(handler_time_ntptime, '!ntptime', 0, 'Gives the current time and date from pool.ntp.org.', '!ntptime', ['!ntptime'])
 register_command_handler(handler_time_date, '!date', 0, 'Gives the current time and date.', '!date', ['!date'])
 register_command_handler(handler_time_swatch, '!swatch', 0, 'Gives the current Swatch Internet time.', '!swatch', ['!swatch'])
