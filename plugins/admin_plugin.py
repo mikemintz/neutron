@@ -1,4 +1,5 @@
 #$ neutron_plugin 01
+# parts of code: Gh0st AKA Bohdan Turkynewych.
 
 def admin_groupchat_invite_handler(source, groupchat, body):
 	if has_access(source, COMMANDS['!join']['access']):
@@ -86,8 +87,16 @@ def admin_crashlog():
 	data = read_file('crash.log')
 	if data.strip():
 	    data = 'Last crashlog:\n\n' + data
-	    for admin in ADMINS:
-		msg(admin.strip(), data)
+	    admin_bcast(data)
+
+def admin_bcast(message):
+    # This function sends message to all of botadmins,
+    # as mentioned in config.txt
+    # useful for debugging purposes.
+    if message.strip():
+	for admin in ADMINS:
+	    msg(admin.strip(), message)
+    
 
 if __name__ == "__main__":
 	# Notify bot admins with
