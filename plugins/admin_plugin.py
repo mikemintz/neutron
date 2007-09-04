@@ -82,6 +82,19 @@ def handler_admin_rejoinall(type, source, parameters):
 		time.sleep(0.5)
 		join_groupchat(groupchat)
 
+def handler_admin_histclean(type, source, parameters):
+	i = 0
+	dots = 20
+	dot = '.'
+	room_sleep = 1.3
+	if type == 'public':
+	    while i <= dots:
+	    	msg(source[1], dot)
+		time.sleep(room_sleep)
+		i += 1
+	else:
+	    smsg(type, source, 'Applicable to rooms only.')    
+
 def admin_crashlog():
 	initialize_file('crash.log','')
 	data = read_file('crash.log')
@@ -108,6 +121,7 @@ register_command_handler(handler_admin_leave, '!leave', 100, 'Joins specified (o
 register_command_handler(handler_admin_msg, '!msg' ,100, 'Sends a message to specified JID.', '!msg <jid> <message>', ['!msg mikem@jabber.org hey mike!'])
 register_command_handler(handler_admin_say, '!say', 100, 'Sends a message to current groupchat or to your JID if message is not through groupchat.', '!say <message>', ['!say hi'])
 register_command_handler(handler_admin_restart, '!restart', 100, 'Restarts me.', '!restart', ['!restart'])
+register_command_handler(handler_admin_histclean, '!hclean', 0, 'Cleans room history using some string.', '!hclean', ['!hclean'])
 register_command_handler(handler_admin_exit, '!exit', 100, 'Exits completely.', '!exit', ['!exit'])
 register_command_handler(handler_admin_uptime, '!uptime', 100, 'Returns Neutron uptime.', '!uptime', ['!uptime'])
 register_command_handler(handler_admin_rooms, '!rooms', 100, 'Returns Neutron\'s rooms.', '!rooms', ['!rooms'])
