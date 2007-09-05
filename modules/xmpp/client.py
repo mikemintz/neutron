@@ -144,13 +144,29 @@ class CommonClient:
 
     def reconnectAndReauth(self):
         """ Example of reconnection method. In fact, it can be used to batch connection and auth as well. """
+
         handlerssave=self.Dispatcher.dumpHandlers()
         self.Dispatcher.PlugOut()
-        if self.__dict__.has_key('NonSASL'): self.NonSASL.PlugOut()
-        if self.__dict__.has_key('SASL'): self.SASL.PlugOut()
-        if self.__dict__.has_key('TLS'): self.TLS.PlugOut()
-        if self.__dict__.has_key('HTTPPROXYsocket'): self.HTTPPROXYsocket.PlugOut()
-        if self.__dict__.has_key('TCPsocket'): self.TCPsocket.PlugOut()
+        try:
+            if self.__dict__.has_key('NonSASL'): self.NonSASL.PlugOut()
+        except:
+            self.DEBUG(self.DBG,"Could not plugout NonSASL")
+        try:
+            if self.__dict__.has_key('SASL'): self.SASL.PlugOut()
+        except:
+            self.DEBUG(self.DBG,"Could not plugout SASL")
+        try:
+            if self.__dict__.has_key('TLS'): self.TLS.PlugOut()
+        except:
+            self.DEBUG(self.DBG,"Could not plugout TLS")
+        try:
+            if self.__dict__.has_key('HTTPPROXYsocket'): self.HTTPPROXYsocket.PlugOut()
+        except:
+            self.DEBUG(self.DBG,"Could not plugout HTTPPROXYsocket")
+        try:
+            if self.__dict__.has_key('TCPsocket'): self.TCPsocket.PlugOut()
+        except:
+            self.DEBUG(self.DBG,"Could not plugout TCPsocket")
         if not self.connect(server=self._Server,proxy=self._Proxy): return
         if not self.auth(self._User,self._Password,self._Resource): return
         self.Dispatcher.restoreHandlers(handlerssave)
@@ -224,6 +240,8 @@ class Client(CommonClient):
             if self.Bind.Bind(resource):
                 self.connected+='+sasl'
                 return 'sasl'
+        else:
+            if self.__dict__.has_key('SASL'): self.SASL.PlugOut()
 
     def getRoster(self):
         """ Return the Roster instance, previously plugging it in and
