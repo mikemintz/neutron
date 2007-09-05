@@ -22,8 +22,10 @@ Dispatcher.SendAndWaitForResponce method will wait for reply stanza before givin
 """
 
 import simplexml,time,sys
+import xml.parsers.expat
 from protocol import *
 from client import PlugIn
+import re
 
 DefaultTimeout=25
 ID=0
@@ -119,7 +121,23 @@ class Dispatcher(PlugIn):
         if self._owner.Connection.pending_data(timeout):
             try: data=self._owner.Connection.receive()
             except IOError: return
-            self.Stream.Parse(data)
+	    # Begin gh0st addition
+	    # Temporary workaround
+	    # Todo: fix some false positives.
+	    is_ok = 1
+	    if not re.search('stream:',data):
+		try:
+		    simplexml.NodeBuilder(data)
+		except xml.parsers.expat.ExpatError:
+		    self.DEBUG(10*'=' + '<<MALFORMED XML>>' + 10*'=')
+		    self.DEBUG(data)
+		    self.DEBUG(10*'=' + '<< END MALFORMED XML>>' + 10*'=')
+		    is_ok = 0
+	    if is_ok == 1:		
+	    	self.Stream.Parse(data)
+	    # End of gh0st addition
+	    # self.Stream.Parse(data)
+	    
             if len(self._pendingExceptions) > 0:
                 _pendingException = self._pendingExceptions.pop()
                 raise _pendingException[0], _pendingException[1], _pendingException[2]
