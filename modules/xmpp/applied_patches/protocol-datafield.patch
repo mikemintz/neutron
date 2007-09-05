@@ -1,0 +1,31 @@
+diff -ur /var/tmp/portage/xmpppy-0.3.1/work/xmpppy-0.3.1/xmpp/protocol.py /usr/lib/python2.4/site-packages/xmpp/protocol.py
+--- /var/tmp/portage/xmpppy-0.3.1/work/xmpppy-0.3.1/xmpp/protocol.py	2006-01-26 14:04:49.000000000 +0100
++++ /usr/lib/python2.4/site-packages/xmpp/protocol.py	2006-09-24 16:29:09.000000000 +0200
+@@ -544,7 +544,7 @@
+     """ This class is used in the DataForm class to describe the single data item.
+         If you are working with jabber:x:data (JEP-0004, JEP-0068, JEP-0122) 
+         then you will need to work with instances of this class. """
+-    def __init__(self,name=None,value=None,typ=None,required=0,desc=None,options=[],node=None):
++    def __init__(self,name=None,value=None,typ=None,required=0,desc=None,label=None,options=[],node=None):
+         """ Create new data field of specified name,value and type.
+             Also 'required','desc' and 'options' fields can be set.
+             Alternatively other XML object can be passed in as the 'node' parameted to replicate it as a new datafiled.
+@@ -556,6 +556,7 @@
+         if typ: self.setType(typ)
+         elif not typ and not node: self.setType('text-single')
+         if required: self.setRequired(required)
++        if label: self.setLabel(label)
+         if desc: self.setDesc(desc)
+         if options: self.setOptions(options)
+     def setRequired(self,req=1):
+@@ -567,6 +568,10 @@
+     def isRequired(self):
+         """ Returns in this field a required one. """
+         return self.getTag('required')
++    def setLabel(self, label):
++        self.setAttr('label',label)
++    def getLabel(self):
++        self.getAttr('label')
+     def setDesc(self,desc):
+         """ Set the description of this field. """
+         self.setTagData('desc',desc)

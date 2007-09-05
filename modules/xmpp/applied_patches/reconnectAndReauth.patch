@@ -1,0 +1,34 @@
+Index: client.py
+===================================================================
+RCS file: /cvsroot/xmpppy/xmpppy/xmpp/client.py,v
+retrieving revision 1.56
+diff -r1.56 client.py
+146a147
+> 
+149,153c150,169
+<         if self.__dict__.has_key('NonSASL'): self.NonSASL.PlugOut()
+<         if self.__dict__.has_key('SASL'): self.SASL.PlugOut()
+<         if self.__dict__.has_key('TLS'): self.TLS.PlugOut()
+<         if self.__dict__.has_key('HTTPPROXYsocket'): self.HTTPPROXYsocket.PlugOut()
+<         if self.__dict__.has_key('TCPsocket'): self.TCPsocket.PlugOut()
+---
+>         try:
+>             if self.__dict__.has_key('NonSASL'): self.NonSASL.PlugOut()
+>         except:
+>             self.DEBUG(self.DBG,"Could not plugout NonSASL")
+>         try:
+>             if self.__dict__.has_key('SASL'): self.SASL.PlugOut()
+>         except:
+>             self.DEBUG(self.DBG,"Could not plugout SASL")
+>         try:
+>             if self.__dict__.has_key('TLS'): self.TLS.PlugOut()
+>         except:
+>             self.DEBUG(self.DBG,"Could not plugout TLS")
+>         try:
+>             if self.__dict__.has_key('HTTPPROXYsocket'): self.HTTPPROXYsocket.PlugOut()
+>         except:
+>             self.DEBUG(self.DBG,"Could not plugout HTTPPROXYsocket")
+>         try:
+>             if self.__dict__.has_key('TCPsocket'): self.TCPsocket.PlugOut()
+>         except:
+>             self.DEBUG(self.DBG,"Could not plugout TCPsocket")

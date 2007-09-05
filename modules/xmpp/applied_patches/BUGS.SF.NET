@@ -1,0 +1,5 @@
+Request ID Summary Open Date Priority Assigned To Submitted By
+1729857 typo in xmpppy/xmpp/commands.py * 2007-06-02 03:10 5 nobody elghinn
+1718953 Fix reconnectAndReauth behavior * 2007-05-14 14:55 5 nobody nobody
+1564556 Addition to the "label" attribute to DataField * 2006-09-24 07:41 5 nobody sgala
+1529650 Fixed bug in auth mechanism * 2006-07-27 05:45 5 nobody berebel

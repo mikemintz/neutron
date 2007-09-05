@@ -1,0 +1,40 @@
+### Eclipse Workspace Patch 1.0
+#P xmpppy
+Index: xmpp/client.py
+===================================================================
+RCS file: /cvsroot/xmpppy/xmpppy/xmpp/client.py,v
+retrieving revision 1.55
+diff -u -r1.55 client.py
+--- xmpp/client.py	3 Jun 2006 13:53:27 -0000	1.55
++++ xmpp/client.py	27 Jul 2006 12:07:10 -0000
+@@ -224,6 +224,8 @@
+             if self.Bind.Bind(resource):
+                 self.connected+='+sasl'
+                 return 'sasl'
++        else:
++            if self.__dict__.has_key('SASL'): self.SASL.PlugOut()
+ 
+     def getRoster(self):
+         """ Return the Roster instance, previously plugging it in and
+Index: xmpp/auth.py
+===================================================================
+RCS file: /cvsroot/xmpppy/xmpppy/xmpp/auth.py,v
+retrieving revision 1.36
+diff -u -r1.36 auth.py
+--- xmpp/auth.py	3 Jun 2006 13:53:27 -0000	1.36
++++ xmpp/auth.py	27 Jul 2006 12:07:10 -0000
+@@ -120,10 +120,10 @@
+ 
+     def plugout(self):
+         """ Remove SASL handlers from owner's dispatcher. Used internally. """
+-        self._owner.UnregisterHandler('features',self.FeaturesHandler,xmlns=NS_STREAMS)
+-        self._owner.UnregisterHandler('challenge',self.SASLHandler,xmlns=NS_SASL)
+-        self._owner.UnregisterHandler('failure',self.SASLHandler,xmlns=NS_SASL)
+-        self._owner.UnregisterHandler('success',self.SASLHandler,xmlns=NS_SASL)
++        if self._owner.__dict__.has_key('features'): self._owner.UnregisterHandler('features',self.FeaturesHandler,xmlns=NS_STREAMS)
++        if self._owner.__dict__.has_key('challenge'): self._owner.UnregisterHandler('challenge',self.SASLHandler,xmlns=NS_SASL)
++        if self._owner.__dict__.has_key('failure'): self._owner.UnregisterHandler('failure',self.SASLHandler,xmlns=NS_SASL)
++        if self._owner.__dict__.has_key('success'): self._owner.UnregisterHandler('success',self.SASLHandler,xmlns=NS_SASL)
+ 
+     def FeaturesHandler(self,conn,feats):
+         """ Used to determine if server supports SASL auth. Used internally. """
