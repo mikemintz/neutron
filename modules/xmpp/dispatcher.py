@@ -125,7 +125,7 @@ class Dispatcher(PlugIn):
 	    # Temporary workaround
 	    # Todo: fix some false positives.
 	    is_ok = 1
-	    if not re.search('stream:',data):
+	    if not (re.search('stream:',data) or re.search('item',data)):
 		try:
 		    simplexml.NodeBuilder(data)
 		except xml.parsers.expat.ExpatError:
