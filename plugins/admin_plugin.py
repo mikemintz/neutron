@@ -50,18 +50,23 @@ def handler_admin_exit(type, source, parameters):
 	JCON.disconnect()
 	os.abort()
 
+
+def t_conv(timestamp):
+	reply = ''
+	seconds = timestamp % 60
+	minutes = (timestamp / 60) % 60
+	hours = (timestamp / 3600) % 60
+	days = timestamp / 216000
+	if days: reply += str(days) + 'd '
+	if hours: reply += str(hours) + 'h '
+	if minutes: reply += str(minutes) + 'm '
+	reply += str(seconds) + 's'
+	return reply
+    
 def handler_admin_uptime(type, source, parameters):
 	if BOOTUP_TIMESTAMP:
 		idletime = int(time.time() - BOOTUP_TIMESTAMP)
-		reply = 'Neutron bot is up for: '
-		seconds = idletime % 60
-		minutes = (idletime / 60) % 60
-		hours = (idletime / 3600) % 60
-		days = idletime / 216000
-		if days: reply += str(days) + 'd '
-		if hours: reply += str(hours) + 'h '
-		if minutes: reply += str(minutes) + 'm '
-		reply += str(seconds) + 's'
+		reply = 'Neutron bot is up for: ' + t_conv(idletime)
 	else:
 		reply = 'Unknown'
 	smsg(type, source, reply)
