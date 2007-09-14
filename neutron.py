@@ -457,6 +457,9 @@ def messageCB(con, msg):
 	fromjid = msg.getFrom()
 	command = ''
 	parameters = ''
+	if msg.getTag('error', {}, 'urn:ietf:params:xml:ns:xmpp-stanzas'):
+		print msgtype
+		print str(msg)
 	if body and string.split(body):
 		command = string.lower(string.split(body)[0])
 		if body.count(' '):
@@ -505,7 +508,9 @@ def presenceCB(con, prs):
 			if code == '409': # name conflict
 				join_groupchat(groupchat, nick + '_')
 				time.sleep(0.5)
-
+			if code == '403': # banned from room
+				print printc(color_red, 'Banned from groupchat: ' + str(groupchat))
+				del GROUPCHATS[groupchat][nick]
 
 
 def iqCB(con, iq):
@@ -525,6 +530,7 @@ def join_groupchats():
 	initialize_file(GROUPCHAT_CACHE_FILE, '[]')
 	groupchats = eval(read_file(GROUPCHAT_CACHE_FILE))
 	for groupchat in groupchats:
+		print printc(color_white,'Joining: ' + groupchat)
 		join_groupchat(groupchat)
 		# Yes, it slows down bot a little,
 		# but avoid too heavy load and some tracebacks
@@ -541,7 +547,8 @@ def start():
 	global JCON
 	global LOGGEDIN
 	LOGGEDIN = 0
-	JCON = xmpp.Client(server=SERVER, port=PORT, debug=[])
+	JCON = xmpp.Client(server=SERVER, port=PORT)
+	#, debug=[])
 
 	get_access_levels()
 
@@ -550,7 +557,7 @@ def start():
 	# ie being already connected, like sending notifications, and so on.
 	# load_plugins()
 
-	load_initscript()
+	#load_initscript()
 
 	if JCON.connect():
 		print printc(color_bright_green,"Connected")
@@ -590,8 +597,10 @@ def start():
 
 	# New place of this function.
 	load_plugins()
+	# New place of this function.
+	load_initscript()
 
-	join_groupchats()	
+	join_groupchats()
 
 	while 1:
 		JCON.Process(10)
