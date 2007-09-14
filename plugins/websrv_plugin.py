@@ -1,8 +1,7 @@
 #$ neutron_plugin 01
 
 import wsgiserver
-# NEEDZ: admin_plugin.py :)
-
+#
 # used example from wsgiserver as template
 # (c) 2006-2007 Bohdan Turkynewych, AKA Gh0st, tb0hdan[at]gmail.com
 
@@ -49,7 +48,13 @@ REDIRECTOR = """<html>
 INDEXD = """
 <div align="center">
 <a href="/plugins.html">Plugins</a>|<a href="/status.html">Status</a>|<a href="/roster.html">Roster</a>
+|<a href="/rooms.html">Rooms</a>|<a href="/commands.html">Commands</a>|<a href="/logs.html">Logs</a>
+|<a href="/access.html">Access</a>
 </div>"""
+
+def exec_time(timestamp):
+    return str(time.time() - timestamp)[:6]
+    
 def index_page(environ, start_response):
     global HEADER
     global FOOTER
@@ -58,7 +63,8 @@ def index_page(environ, start_response):
     status = '200 OK'
     response_headers = [('Content-type','text/html')]
     start_response(status, response_headers)
-    data = HEADER + INDEXD + FOOTER%t_conv(int(time.time() - start_stamp))
+    time.sleep(0.01)
+    data = HEADER + INDEXD + FOOTER%exec_time(start_stamp)
     return data
 
 def index_redir(environ, start_response):
@@ -85,7 +91,8 @@ def list_plugins(environ, start_response):
 	for plugin in valid_plugins:
 	    reply += plugin.split('_plugin.py')[0] + '\n'
 	reply += 'Total plugins: ' + str(total_plugins)
-	data = HEADER + INDEXD + '<pre>' + reply + '</pre>' + FOOTER%t_conv(int(time.time() - start_stamp))
+	time.sleep(0.01)
+	data = HEADER + INDEXD + '<pre>' + reply + '</pre>' + FOOTER%exec_time(start_stamp)
 	return data
 	
 # from admin_plugin.py
@@ -111,13 +118,35 @@ def display_status(environ, start_response):
 	python_ver = 'Python: ' + sys.version.split(' ')[0]
 	osver = osver + ' ' + python_ver + ' on ' + machver
 	# end
-	
-	data = HEADER + INDEXD + 'Running using: <b>%s</b></br><pre>'%osver + crashdata + '</pre>' + FOOTER%t_conv(int(time.time() - start_stamp))
+	time.sleep(0.01)
+	data = HEADER + INDEXD + '<br>Running using: <b>%s</b></br><pre>'%osver + crashdata + '</pre>' + FOOTER%exec_time(start_stamp)
 	return data
 
+def commands_page(environ, start_response):
+	global HEADER
+	global FOOTER
+	global INDEXD
+	start_stamp = time.time()
+	status = '200 OK'
+	response_headers = [('Content-type','text/html')]
+        start_response(status, response_headers)
+	source = ['none@jabber.org','/Client']
+	# from help_plugin.py
+	commandlist = []
+	for command in COMMANDS.keys():
+    	    if has_access(source, COMMANDS[command]['access']):
+        	commandlist.append(command)
+	commandlist.sort()
+	# end
+	reply = ''
+	for cmd in commandlist:
+	    reply += cmd + '<br>\n'
+	time.sleep(0.01)
+	data = HEADER + INDEXD +'<br>' + reply + FOOTER%exec_time(start_stamp)
+	return data
 
 wsgi_apps = [('/', index_redir),('/index.html', index_page),('/plugins.html',list_plugins),
-	     ('/status.html', display_status)
+	     ('/status.html', display_status), ('/commands.html',commands_page)
 	    ]
 
 server = wsgiserver.CherryPyWSGIServer((listen_addr, listen_port), wsgi_apps,
