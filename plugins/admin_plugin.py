@@ -128,7 +128,7 @@ register_command_handler(handler_admin_say, '!say', 100, 'Sends a message to cur
 register_command_handler(handler_admin_restart, '!restart', 100, 'Restarts me.', '!restart', ['!restart'])
 register_command_handler(handler_admin_histclean, '!hclean', 0, 'Cleans room history using some string.', '!hclean', ['!hclean'])
 register_command_handler(handler_admin_exit, '!exit', 100, 'Exits completely.', '!exit', ['!exit'])
-register_command_handler(handler_admin_uptime, '!uptime', 100, 'Returns Neutron uptime.', '!uptime', ['!uptime'])
+register_command_handler(handler_admin_uptime, '!uptime', 0, 'Returns Neutron uptime.', '!uptime', ['!uptime'])
 register_command_handler(handler_admin_rooms, '!rooms', 100, 'Returns Neutron\'s rooms.', '!rooms', ['!rooms'])
 register_command_handler(handler_admin_rejoinall, '!rejoinall', 100, 'Rejoins *ALL* Neutron\'s rooms.', '!rejoinall', ['!rejoinall'])
 
