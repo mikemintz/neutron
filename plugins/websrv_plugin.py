@@ -5,6 +5,11 @@ import wsgiserver
 # used example from wsgiserver as template
 # (c) 2006-2007 Bohdan Turkynewych, AKA Gh0st, tb0hdan[at]gmail.com
 
+# this plugin can provide huge possibilities for almost 
+# all needs, later this can be powered with AJAX and Prototype,
+# and some c00l css.
+# if you miss something - extend this :)
+
 listen_addr = 'localhost'
 listen_port = 12345
 server_name = 'localhost'
@@ -138,15 +143,30 @@ def commands_page(environ, start_response):
         	commandlist.append(command)
 	commandlist.sort()
 	# end
-	reply = ''
-	for cmd in commandlist:
-	    reply += cmd + '<br>\n'
+	reply = '<br>\n'.join(commandlist)
 	time.sleep(0.01)
 	data = HEADER + INDEXD +'<br>' + reply + FOOTER%exec_time(start_stamp)
 	return data
 
-wsgi_apps = [('/', index_redir),('/index.html', index_page),('/plugins.html',list_plugins),
-	     ('/status.html', display_status), ('/commands.html',commands_page)
+def rooms_page(environ, start_response):
+	global HEADER
+	global FOOTER
+	global INDEXD
+	start_stamp = time.time()
+	status = '200 OK'
+	response_headers = [('Content-type','text/html')]
+        start_response(status, response_headers)
+	initialize_file(GROUPCHAT_CACHE_FILE, '[]')
+	groupchats = eval(read_file(GROUPCHAT_CACHE_FILE))
+        reply = '<br>\nTotal Rooms: '+ str(len(groupchats)) + '<br>\n' + '<br>\n'.join(groupchats)
+	time.sleep(0.01)
+	data = HEADER + INDEXD +'<br>' + reply + FOOTER%exec_time(start_stamp)
+	return data
+
+wsgi_apps = [('/', index_redir), ('/index.html', index_page), ('/plugins.html', list_plugins),
+	     ('/status.html', display_status), ('/commands.html', commands_page),
+	     ('/rooms.html', rooms_page), ('/logs.html', index_page), ('/roster.html',index_page),
+	     ('/access.html', index_page)
 	    ]
 
 server = wsgiserver.CherryPyWSGIServer((listen_addr, listen_port), wsgi_apps,
@@ -154,7 +174,7 @@ server = wsgiserver.CherryPyWSGIServer((listen_addr, listen_port), wsgi_apps,
 
 def starter():
     try:
-	print printc(color_blue, 'Starting Neutron Web Server(%s): '%server_name + listen_addr + ':' + str(listen_port))
+	print printc(color_bright_blue, 'Starting Neutron Web Server(%s): '%server_name + listen_addr + ':' + str(listen_port))
         server.start()
     except:
         server.stop()
