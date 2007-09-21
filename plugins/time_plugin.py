@@ -1,6 +1,6 @@
 #$ neutron_plugin 01
 
-from socket import *
+import socket
 import struct
 
 def handler_time_date(type, source, parameters):
@@ -32,9 +32,9 @@ def handler_time_swatch(type, source, parameters):
 
 def handler_time_ntptime(type, source, parameters):
     reply = ''
-    time_server = (gethostbyname('pool.ntp.org'), 123)
+    time_server = (socket.gethostbyname('pool.ntp.org'), 123)
     TIME1970 = 2208988800L      # Thanks to F.Lundh
-    client = socket( AF_INET, SOCK_DGRAM )
+    client = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
     data = '\x1b' + 47 * '\0'
     client.sendto(data, time_server)
     data, address = client.recvfrom( 1024 )
