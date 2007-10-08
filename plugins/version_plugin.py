@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 # Talisman author: dimichxp
-# further developer: Als
-# Parts of code, Bohdan Turkynewych, AKA Gh0st.
+# Talisman further developer: Als
+# Parts of code, Als
+# (c) Bohdan Turkynewych, AKA Gh0st.
 
 version_pending=[]
 time_pending=[]
@@ -165,7 +166,53 @@ def handler_ping_answ(coze, res, type, source):
 	else:
 		rep = u'not found'
 	smsg(type, source, rep)
-	
+
+def handler_pong(type, source, parameters):
+	    smsg(type, source, '!ping')
+
+def handler_rega_response(bla, response, type, source):
+	if response:
+		if response.getType() == 'result':
+			smsg(type, source, 'Registration successful')
+			return
+		else:
+			reply = 'Error whilst registering account.'
+	else:
+		reply = 'Zero sized reply.'
+	smsg(type, source, reply)	
+
+def handler_rega(type, source, parameters):
+    parameters = parameters.strip()
+    if parameters:
+	if len(parameters.split(' ')) == 2:
+	    jid = parameters.split(' ')[0]
+	    password = parameters.split(' ')[1]
+	    if len(jid.split('@')) == 2:
+		username = jid.split('@')[0]
+		server = jid.split('@')[1]
+		reply = 'Registering account:  Username: %s '%username + 'Server: %s '%server + 'Password: %s'%password
+	    else:
+		reply = 'Wrong syntax'
+		smsg(type, source, reply)
+		return
+	else:
+	     reply = 'Wrong syntax'
+	     smsg(type, source, reply)
+	     return
+    smsg(type, source, reply)
+    iq = xmpp.Iq('set')
+    iq.setTo(server)
+    iq.setID('rega_'+str(random.randrange(1000, 9999)))
+    query = xmpp.Node('query')
+    query.setNamespace('jabber:iq:register')
+    query.setTagData('username', username)
+    query.setTagData('password', password)
+    iq.addChild(node=query)
+    time.sleep(10)
+    JCON.SendAndCallForResponse(iq, handler_rega_response, {'type': type, 'source': source})
+
 register_command_handler(handler_version, '!version', 0, 'Returns client version.', '!version <nick>', ['!version Neutron'])
 register_command_handler(handler_time, '!time', 0, 'Returns client time.', '!time <nick>', ['!time Neutron'])
 register_command_handler(handler_ping, '!ping', 0, 'Returns client ping by using iq:version.', '!ping <nick>', ['!ping Neutron'])
+register_command_handler(handler_rega, '!register', 0, 'Registers account on foreign server using iq:register.', '!register <nick>@<server> <password>', ['!register Neutron@jabber.orgg mypassword'])
+register_command_handler(handler_pong,'!pong',0,'','',[''])
