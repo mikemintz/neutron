@@ -22,6 +22,24 @@ def handler_bashorg_get(type, source, parameters):
     message='\n' + message.strip()
     smsg(type,source,unicode(message,'windows-1251'))
 
+def handler_ukrbashorg_get(type, source, parameters):
+    if parameters.strip()=='':
+        req = urllib2.Request('http://ukrbash.org/random')
+    else:
+        req = urllib2.Request('http://ukrbash.org/quote/'+parameters.strip())
+    req.add_header = ('User-agent', 'Mozilla/5.0')
+    try:
+	r = urllib2.urlopen(req)
+	target = r.read()
+	od = re.search('</div><div>',target)
+	message = target[od.end():]
+	message = message[:re.search('</div></div></div>',message).start()]
+	message = decode(message)
+	message = '\n' + message.strip()
+	smsg(type,source,unicode(message,'utf-8'))
+    except:
+        smsg(type,source,unicode('╤нтернету нема╓, торба, при╖хали... ','koi8-u'))
+
 def handler_bashorgru_get(type, source, parameters):
     if parameters.strip()=='':
         req = urllib2.Request('http://bash.org.ru/random')
@@ -152,8 +170,13 @@ def decode(text):
 
 register_command_handler(handler_bashorg_get, '!bo', 0, 'Get quote from bash.org', '!bo', ['!bo 22'])
 register_command_handler(handler_bashorg_get, '!bashorg', 0, 'Get quote from bash.org', '!bashorg', ['!bashorg 22'])
+#
+register_command_handler(handler_ukrbashorg_get, '!ubo', 0, 'Get quote from ukrbash.org', '!ubo', ['!ubo 22'])
+register_command_handler(handler_ukrbashorg_get, '!ukrbashorg', 0, 'Get quote from ukrbash.org', '!ukrbashorg', ['!ukrbashorg 22'])
+#
 register_command_handler(handler_bashorgru_get, '!bor', 0, 'Get quote from bash.org.ru', '!bor', ['!bor 22'])
 register_command_handler(handler_bashorgru_get, '!bashorgru', 0, 'Get quote from bash.org.ru', '!bashorgru', ['!bashorgru 22'])
+#
 register_command_handler(handler_irclv_get, '!irclv', 0, 'Get quote from irc.lv', '!irclv', ['!irclv 105005'])
 register_command_handler(handler_ostrie_get, '!ost', 0, 'Get quote from ostrie.ru', '!ost', ['!ost 838923'])
 register_command_handler(handler_linuxorgru_get, '!lor', 0, 'Get latest news post from linux.org.ru. Note: Parameters ignored.', '!lor', ['!lor 22'])
