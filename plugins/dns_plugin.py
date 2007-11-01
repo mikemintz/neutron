@@ -32,6 +32,12 @@ def get_extended_info(name):
         	if string.find(line,'Server:') == 0:
             	    server_string = line
 		    server_string = string.replace(server_string, 'Server:', '')
+	
+	    if len(server_string) == 0:	
+		for line in string.split(s, "\r\n"):
+		    if string.find(line,'X-Powered-By:') == 0:
+            		server_string = line
+			server_string = string.replace(server_string, 'X-Powered-By:', '')
 
 	reply = 'IP Address: ' + ipaddr + '\r\n'
 
