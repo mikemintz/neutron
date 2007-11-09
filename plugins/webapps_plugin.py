@@ -165,9 +165,40 @@ def handler_linuxorgru_get(type, source, parameters):
     message = '\n' + message.strip()
     smsg(type, source, unicode(message, 'koi8-r'))
 
-def decode(text):
-    return strip_tags.sub('', text.replace('<br>','\n')).replace('&nbsp;', ' ').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('<br />','\n')
+def handler_2ipru_get(type, source, parameters):
+    if parameters.strip()=='':
+	smsg(type, source, 'Empty Input')
+	return
+    else:
+	parameters = parameters.strip()
+	if len(parameters)>15:
+			smsg(type, source, 'Wrong format')
+			return
+	postData = urllib.urlencode({'ip':parameters,'parse':'поиск'})
+        req2 = urllib2.Request('http://2ip.ru/server.php',postData)
+	req2.add_header = ('User-agent', 'Mozilla/5.0')
+        try:
+    	    r = urllib2.urlopen(req2)
+    	    target = r.read()
+    	    od = re.search('<br>-----------------------<br>',target)
+    	    message = target[od.end():]
+    	    message = message[:re.search('<br><br><br><br>',message).start()]
+    	    message = decode(message)
+	    if len(message) != 0:
+    		message = '\n' + message.strip()
+	    else:
+		message = 'Ooops. Nothing ;-)'
+    	    smsg(type,source,unicode(message,'windows-1251'))
+        except:
+    	    smsg(type,source,unicode('Кончился интернет, всё, приехали... ','koi8-u'))
 
+def decode(text):
+    data = text.replace('<br>','\n').replace('&nbsp;', ' ').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('<br />','\n').replace('<li>','\r\n')
+    return strip_tags.sub('', data)
+
+#
+register_command_handler(handler_2ipru_get, '!2ip', 0, 'Get ip info from 2ip.ru', '!2ip', ['!2ip 22.32.42.53'])
+#
 register_command_handler(handler_bashorg_get, '!bo', 0, 'Get quote from bash.org', '!bo', ['!bo 22'])
 register_command_handler(handler_bashorg_get, '!bashorg', 0, 'Get quote from bash.org', '!bashorg', ['!bashorg 22'])
 #
