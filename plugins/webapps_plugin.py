@@ -192,12 +192,46 @@ def handler_2ipru_get(type, source, parameters):
         except:
     	    smsg(type,source,unicode('Кончился интернет, всё, приехали... ','koi8-u'))
 
+def handler_pereklad_get(type, source, parameters):
+    if parameters.strip()=='':
+	smsg(type, source, 'Empty Input')
+	return
+    else:
+	parameters = parameters.strip()
+	if len(parameters)>1024:
+			smsg(type, source, 'Wrong format')
+			return
+	parameters = parameters.split()
+	if len(parameters) >= 3 and parameters[0] in ('Ukr','Rus','Eng','Ger','Fre','Lat') and parameters[1] in ('Ukr','Rus','Eng','Ger','Fre','Lat'):
+		text = ' '.join(parameters[2:])
+	else:
+		smsg(type, source, 'Wrong format')
+    		return
+	postData = urllib.urlencode({'SrcTxt': text.encode('windows-1251'), 'Translate':' Перекласти ','TranFrom':parameters[0],'TranTo':parameters[1], 'Subject':'**'})
+        req2 = urllib2.Request('http://pda.online.ua/pereklad/index.php',postData)
+	req2.add_header = ('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.9) Gecko/20071030 SeaMonkey/1.1.6')
+        try:
+    	    r = urllib2.urlopen(req2)
+    	    target = r.read()
+    	    od = re.search('</form>',target)
+    	    message = target[od.end():]
+    	    message = message[:re.search('</textarea>',message).start()]
+    	    message = decode(message)
+	    if len(message) != 0:
+    		message = '\n' + message.strip()
+	    else:
+		message = 'Ooops. Nothing ;-)'
+    	    smsg(type,source,unicode(message,'windows-1251'))
+        except:
+    	    smsg(type,source,unicode('Кончился интернет, всё, приехали... ','koi8-u'))
+
 def decode(text):
     data = text.replace('<br>','\n').replace('&nbsp;', ' ').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('<br />','\n').replace('<li>','\r\n')
     return strip_tags.sub('', data)
 
 #
 register_command_handler(handler_2ipru_get, '!2ip', 0, 'Get ip info from 2ip.ru', '!2ip', ['!2ip 22.32.42.53'])
+register_command_handler(handler_pereklad_get, '!pereklad', 0, 'Translate using online.ua', '!pereklad [Eng|Ukr|Rus|Ger|Lat|Fre] [Eng|Ukr|Rus|Ger|Lat|Fre] <word>', ['!pereklad Eng Ger dog'])
 #
 register_command_handler(handler_bashorg_get, '!bo', 0, 'Get quote from bash.org', '!bo', ['!bo 22'])
 register_command_handler(handler_bashorg_get, '!bashorg', 0, 'Get quote from bash.org', '!bashorg', ['!bashorg 22'])
