@@ -166,6 +166,7 @@ def handler_linuxorgru_get(type, source, parameters):
     smsg(type, source, unicode(message, 'koi8-r'))
 
 def handler_2ipru_get(type, source, parameters):
+    domainre   = '[a-zA-Z_0-9]+?(\.[a-zA-Z_0-9]{2,6}){1,4}'
     if parameters.strip()=='':
 	smsg(type, source, 'Empty Input')
 	return
@@ -188,8 +189,14 @@ def handler_2ipru_get(type, source, parameters):
     		message = '\n' + message.strip()
 	    else:
 		message = 'Ooops. Nothing ;-)'
-    	    smsg(type,source,unicode(message,'windows-1251'))
+	    reply = ''
+	    for line in message.split('\r\n'):
+    		if line.strip():
+		    if re.sub(domainre, '', line).strip() == '':
+        		reply += line + '\r\n'
+    	    smsg(type,source,unicode(reply,'windows-1251'))
         except:
+	    raise
     	    smsg(type,source,unicode('Кончился интернет, всё, приехали... ','koi8-u'))
 
 def handler_pereklad_get(type, source, parameters):
