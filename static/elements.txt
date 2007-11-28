@@ -103,7 +103,7 @@ Xi Xenon 54
 Mg Magnesium 12
 Yb Ytterbium 70
 Mn Manganese 25
-Yb Yttrium 39
+Y  Yttrium 39
 Mt Meitnerium 109
 Zn Zinc 30
 Zr Zirconium 40
