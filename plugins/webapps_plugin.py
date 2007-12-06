@@ -7,6 +7,10 @@ from re import compile as re_compile
 
 strip_tags = re_compile(r'<[^<>]+>')
 
+def decode(text):
+    data = text.replace('<br>','\n').replace('&nbsp;', ' ').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('<br />','\n').replace('<li>','\r\n')
+    return strip_tags.sub('', data)
+
 def handler_bashorg_get(type, source, parameters):
     if parameters.strip():
         req = urllib2.Request('http://bash.org/?'+parameters.strip())
@@ -232,10 +236,74 @@ def handler_pereklad_get(type, source, parameters):
         except:
     	    smsg(type,source,unicode('Кончился интернет, всё, приехали... ','koi8-u'))
 
-def decode(text):
-    data = text.replace('<br>','\n').replace('&nbsp;', ' ').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('<br />','\n').replace('<li>','\r\n')
-    return strip_tags.sub('', data)
 
+def handler_delicious_get(type, source, parameters):
+    maxlen = 24
+    userre   = '[a-zA-Z_0-9]{3,' + str(maxlen) + '}'
+    tagre   = '[a-zA-Z_0-9:]{1,' + str(maxlen) + '}'
+    if parameters.strip()=='':
+	smsg(type, source, 'Empty Input')
+	return
+    else:
+	parameters = parameters.strip()
+	if len(parameters)>maxlen:
+			smsg(type, source, 'Wrong format')
+			return
+	parameters = parameters.split()
+	if len(parameters) == 2 and re.sub(userre, '', parameters[0]).strip() == '' and re.sub(tagre, '', parameters[1]).strip() == '':
+		req2 = urllib2.Request('http://del.icio.us/' + parameters[0] + '/' + parameters[1])
+	else:
+		if len(parameters)==1:
+		    req2 = urllib2.Request('http://del.icio.us/' + parameters[0])
+		else:
+		    smsg(type, source, 'Wrong format')
+    		    return
+	req2.add_header = ('User-agent', 'Mozilla/5.0')
+        try:
+    	    r = urllib2.urlopen(req2)
+    	    target = r.read()
+	    if len(parameters)==1:
+		    s_start='<li class="bundle fold"><h3 class="label"><span>tags</span></h3>'
+		    s_stop='</ul>'
+	    else:
+		    s_start='<ol class="posts">'
+		    s_stop='</ol>'
+    	    od = re.search(s_start,target)
+    	    message = target[od.end():]
+    	    message = message[:re.search(s_stop,message).start()]
+	    if len(parameters)==1:
+    		message = decode(message)
+	    if len(message) != 0:
+    		message = '\n' + message.strip()
+	    else:
+		message = 'Ooops. Nothing ;-)'
+	    reply = ''
+	    if len(parameters)==1:
+		for line in message.split('\r\n'):
+    		    if line.strip():
+			    urlcount = line.split()[0].strip()
+			    tag	     = line.split()[1].strip()
+        		    reply += tag + ' (' + str(urlcount) + ' urls)\r\n'
+	    else:
+		s_start='href="'
+		s_stop='"'
+		for line in message.split('\n'):
+		    if re.search('<h4 class="desc">',line):
+			od = re.search(s_start,line)
+	        	bookurl = line[od.end():]
+    			bookurl = bookurl[:re.search(s_stop,bookurl).start()].strip()
+			descr = decode(line).strip()
+ 			reply += descr + ':  ' + bookurl + '\r\n'
+
+    	    smsg(type,source,reply)
+        except:
+    	    smsg(type,source,'WHoooPS!')
+
+register_command_handler(handler_delicious_get, '!delicious', 0, """
+Get info from del.icio.us:
+!delicious user - Gets tags
+!delicious user tag - Get urls from specified tag
+""", '!delicious [user [tag]]', ['!delicious user','!delicious user photo'])
 #
 register_command_handler(handler_2ipru_get, '!2ip', 0, 'Get ip info from 2ip.ru', '!2ip', ['!2ip 22.32.42.53'])
 register_command_handler(handler_pereklad_get, '!pereklad', 0, 'Translate using online.ua', '!pereklad [Eng|Ukr|Rus|Ger|Lat|Fre] [Eng|Ukr|Rus|Ger|Lat|Fre] <word>', ['!pereklad Eng Ger dog'])
