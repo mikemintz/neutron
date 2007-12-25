@@ -124,17 +124,21 @@ class Dispatcher(PlugIn):
 	    # Begin gh0st addition
 	    # Temporary workaround
 	    # Todo: fix some false positives.
+	    # 2007-12-25, Added stanza size checking.
 	    is_ok = 1
 	    if not (re.search('stream:',data) or re.search('item',data)):
-		try:
-		    simplexml.NodeBuilder(data)
-		except xml.parsers.expat.ExpatError:
-		    self.DEBUG(10*'=' + '<<MALFORMED XML>>' + 10*'=')
-		    self.DEBUG(data)
-		    self.DEBUG(10*'=' + '<< END MALFORMED XML>>' + 10*'=')
-		    is_ok = 0
-	    if is_ok == 1:		
-	    	self.Stream.Parse(data)
+	    	try:
+	    	    simplexml.NodeBuilder(data)
+	    	except xml.parsers.expat.ExpatError:
+	    	    self.DEBUG(10*'=' + '<< MALFORMED XML >>' + 10*'=')
+	    	    self.DEBUG(data)
+	    	    self.DEBUG(10*'=' + '<< END MALFORMED XML >>' + 10*'=')
+	    	    is_ok = 0
+	    if is_ok == 1:
+		if len(data) <= 3000:
+		    self.Stream.Parse(data)
+		else:
+		    self.DEBUG(5*'=-' + '<< STANZA LEN EXCEEDS 3000 Bytes!!! >>' + 5*'-=')
 	    # End of gh0st addition
 	    # self.Stream.Parse(data)
 	    
