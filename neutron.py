@@ -24,7 +24,7 @@ import urllib2
 import iq
 
 ################################################################################
-iq.version = "0.5.x"
+iq.version = "0.5.x http://svn.hypothetic.org/neutron/branches/gh0st-dev/"
 iq.vername = "Neutron"
 #
 CONFIGURATION_FILE = 'dynamic/config.cfg'
