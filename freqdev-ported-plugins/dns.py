@@ -1,41 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
-
-#  Neutron plugin, ported to FreQ.
-#  ddns.py
-#  Copyright (C) 2002-2006 Mike Mintz <mikemintz@gmail.com>
-#  Copyright (C) 2007 Mike Mintz <mikemintz@gmail.com>
-#                     Anaël Verrier <elghinn@free.fr>
-#  Parts of code:
-#  Author: Bohdan Turkynewych, AKA Gh0st, tb0hdan[at]gmail.com
-    
-#  This program is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
-#  (at your option) any later version.
-
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
+# GPLv2, (c) Mike Mintz 2002-2007, Bohdan Turkynewych
+# http://svn.hypothetic.org/neutron/branches/gh0st-dev/freqdev-ported-plugins/dns.py
 import socket
 import string
 import urllib
 import urllib2
-
 from re import compile as re_compile
-
 strip_tags = re_compile(r'<[^<>]+>')
-
 def decode(text):
     data = text.replace('<br>','\n').replace('&nbsp;', ' ').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('<br />','\n').replace('<li>','\r\n')
     return strip_tags.sub('', data)
-
 # Begin Gh0st addition
 def get_extended_info(name):
     server = name.strip()
@@ -59,7 +34,6 @@ def get_extended_info(name):
 	    conn.close()
 	except socket.error:
 	    pass	
-
 	if len(s) !=0 :
 	    for line in string.split(s, "\r\n"):
         	if string.find(line,'Server:') == 0:
@@ -71,19 +45,14 @@ def get_extended_info(name):
 		    if string.find(line,'X-Powered-By:') == 0:
             		server_string = line
 			server_string = string.replace(server_string, 'X-Powered-By:', '')
-
 	reply = 'IP Address: ' + ipaddr + '\r\n'
-
 	if len(server_string) !=0:
-
 	    reply = reply +  'Server Type: ' + server_string + '\r\n'
 	    server_web = 'active'	
-
 	else:
 	    server_web = 'offline'
 	reply = reply +  'Website Status: ' + server_web
 	reply += '\r\n' + geoip_get(ipaddr)
-
     else:
 	reply = 'Unable to resolve'
     return reply
@@ -125,8 +94,6 @@ def geoip_get(parameters):
 	    return reply
         except:
 	    return 'Error occured while querying maxmind.com'
-	    
-
 # End Gh0st addition
 def dns_query(query):
 	try:
@@ -148,5 +115,4 @@ def handler_dns_dns(type, source, parameters):
 		source.msg(type, result)
 	else:
 		source.msg(type, 'Invalid Syntax')
-
 bot.register_cmd_handler(handler_dns_dns, '.dns')
