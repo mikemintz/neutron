@@ -16,7 +16,6 @@
 	* neutron.py/config.txt: (new) Neutron now support HTTP proxys.
 
 
-
 0.5 - 30/Sep/2005 - Badlop
 
 	* neutron.py: New --pid command line option, writes PID to a file. (Mikem)
