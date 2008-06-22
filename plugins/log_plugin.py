@@ -44,7 +44,7 @@ def log_get_fp(type, source, (year, month, day, hour, minute, second, weekday, y
     else:
         logdir = PRIVATE_LOG_DIR
     if logdir[-1] == '/':
-        logdir = LOGDIR[:-1]
+        logdir = logdir[:-1]
     str_year = str(year)
     str_month = str(month)
     str_day = str(day)
