@@ -86,6 +86,7 @@ rss      Subscribes a chatroom to a RSS feed
 vote     Polls
 
 # Utilities
+deadline    Add multiple deadlines (date and message) and display remaining time
 query       Create word definitions and stores in file 
 temperature Converts temperatures to and from C and F
 time        Gives UTC and Internet time
