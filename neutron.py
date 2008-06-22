@@ -400,7 +400,9 @@ def isadmin(jid):
 
 def messageCB(con, msg):
 	msgtype = msg.getType()
-	body = msg.getBody().strip()
+	body = msg.getBody()
+	if body != None:
+		body = body.strip()
 	fromjid = msg.getFrom()
 	command = ''
 	parameters = ''
