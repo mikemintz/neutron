@@ -24,20 +24,24 @@ def handler_bashorg_get(type, source, parameters):
 
 def handler_bashorgru_get(type, source, parameters):
     if parameters.strip()=='':
-        req = urllib2.Request('http://bash.org.ru/quote.php')
+        req = urllib2.Request('http://bash.org.ru/random')
     else:
-        req = urllib2.Request('http://bash.org.ru/quote.php?num='+parameters.strip())
+        req = urllib2.Request('http://bash.org.ru/search?text='+urllib.quote_plus(parameters.strip().encode('windows-1251')))
     req.add_header = ('User-agent', 'Mozilla/5.0')
+    req.add_header = ('Accept-Charset', 'windows-1251')
     try:
         r = urllib2.urlopen(req)
         target = r.read()
-        od = re.search('<td class="dat">',target)
-        message = target[od.end():]
-        message = message[:re.search('</td>',message).start()]
+        od = re.search(r'<div class="q">.*?<div class="vote">.*?<a.*?</div>.*?<div>(.*?)</div>.*?</div>', target, re.DOTALL)
+        if od == None or od.group(1) == None:
+            smsg(type,source,unicode('©©©©©© ©© ©©©©©© ©©©©©©©©... ','koi8-u'))
+            return
+        message = od.group(1)
         message = decode(message)
         message = '\n' + message.strip()
         smsg(type,source,unicode(message,'windows-1251'))
-    except:
+    except Exception, e:
+        print str(e)
         smsg(type,source,unicode('Кончился интернет, всё, приехали... ','koi8-u'))
 
 def handler_linuxorgru_get(type, source, parameters):
