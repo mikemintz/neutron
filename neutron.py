@@ -66,8 +66,11 @@ if HTTP_PROXY != "":
     proxies = {'http': HTTP_PROXY}
     # environment variable for urllib
     http_proxy = HTTP_PROXY
+    # set up authentication info
+    # Required for python 2.5.2, should work in python 2.4
+    authinfo = urllib2.HTTPBasicAuthHandler()
     # urllib2
-    opener = urllib2.build_opener(proxy_support, '', urllib2.CacheFTPHandler)
+    opener = urllib2.build_opener(proxy_support, authinfo, urllib2.CacheFTPHandler)
     urllib2.install_opener(opener)
 else:
     proxies = {}
