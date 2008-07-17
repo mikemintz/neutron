@@ -15,7 +15,7 @@ def decode(text):
 def get_extended_info(name):
     server = name.strip()
     if len(server) == 0:
-	    server = 'www.sex.com'
+	    server = 'www.jabber.org'
     port = 80
     has_ip = 1
     try:
