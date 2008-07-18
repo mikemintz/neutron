@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
+
 from xml.sax import make_parser, handler
 import thread
 import re
@@ -18,7 +19,7 @@ last_query = 0
 UNSENT_HEADLINES = []
 RSS_IS_ENABLED = 0
 # Parts of code from modules/xmpp/debug.py
-# # Wanna some colors :)
+# Wanna some colors :)
 color_none         = chr(27) + "[0m"
 color_black        = chr(27) + "[30m"
 color_red          = chr(27) + "[31m"
@@ -151,7 +152,6 @@ def rss_query_channel(channel):
 	try:
 		parser.parse(RSS_CACHE['channels'][channel]['url'])
 	except:
-		#raise
 		print printc(color_bright_red,'error parsing: ') + channel
 
 def rss_dispatch_headlines(channel, info, items):
@@ -181,9 +181,8 @@ def rss_dispatch_headline(channel, item):
 	GROUPCHATS = bot.muc.load_groupchats()
 	for groupchat in RSS_CACHE['channels'][channel]['subscribers']:
 		if groupchat in GROUPCHATS:
-			print printc(color_yellow,channel) + ': Sending Headline To: ' + printc(color_gray,groupchat)
-			source = groupchat
-			source.msg('groupchat', reply)
+			print printc(color_yellow,channel) + ': Sending Headline To: ' + printc(color_light_gray,groupchat)
+			bot.muc.msg('groupchat', groupchat, reply)
 
 ################################################################################
 
