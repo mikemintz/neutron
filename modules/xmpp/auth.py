@@ -173,10 +173,19 @@ class SASL(PlugIn):
         chal={}
         data=base64.decodestring(incoming_data)
         self.DEBUG('Got challenge:'+data,'ok')
-        for pair in re.findall('(\w+=(?:"[^"]+")|(?:[^,]+))',data):
-            key,value=pair.split('=', 1)
-            if value[:1]=='"' and value[-1:]=='"': value=value[1:-1]
+	# Original
+        #for pair in re.findall('(\w+=(?:"[^"]+")|(?:[^,]+))',data):
+        #    key,value=pair.split('=', 1)
+        #    if value[:1]=='"' and value[-1:]=='"': value=value[1:-1]
+        #    chal[key]=value
+    
+	# Regex in line 176 of auth.py doesn't support values like qop="auth, auth-int"
+	# Reported by: http://code.google.com/u/AmneZiaTeam/
+	for pair in re.findall(r'(.*?)=(".*?"|[^"]*?)(,|$)',data):
+	    key = pair[0].strip(' ')
+	    value = pair[1].strip('"')
             chal[key]=value
+
         if chal.has_key('qop') and 'auth' in chal['qop'].split(','):
             resp={}
             resp['username']=self.username
