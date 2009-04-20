@@ -44,7 +44,7 @@ def log_get_fp(type, source, (year, month, day, hour, minute, second, weekday, y
     else:
         logdir = PRIVATE_LOG_DIR
     if logdir[-1] == '/':
-        logdir = LOGDIR[:-1]
+        logdir = logdir[:-1]
     str_year = str(year)
     str_month = str(month)
     str_day = str(day)
@@ -67,10 +67,10 @@ def log_get_fp(type, source, (year, month, day, hour, minute, second, weekday, y
     	    os.mkdir(logdir + '/' + source + '/' + str_year + '/' + str_month)
 	except:
 	    pass    
-    if LOG_FILENAME_CACHE.has_key(source):
-        if LOG_FILENAME_CACHE[source] != filename:
+    if LOG_FILENAME_CACHE.has_key((source, type)):
+        if LOG_FILENAME_CACHE[(source, type)] != filename:
             try:
-		fp_old = file(LOG_FILENAME_CACHE[source], 'a')
+		fp_old = file(LOG_FILENAME_CACHE[(source, type)], 'a')
         	log_write_footer(fp_old)
         	fp_old.close()
 	    except:
@@ -79,20 +79,20 @@ def log_get_fp(type, source, (year, month, day, hour, minute, second, weekday, y
             fp = file(filename, 'a')
             return fp
         else:
-            LOG_FILENAME_CACHE[source] = filename
+            LOG_FILENAME_CACHE[(source, type)] = filename
             write_file(LOG_CACHE_FILE, str(LOG_FILENAME_CACHE))
             fp = file(filename, 'w')
             log_write_header(fp, source, (year, month, day, hour, minute, second, weekday, yearday, daylightsavings))
             return fp
     else:
         if os.path.exists(filename):
-            LOG_FILENAME_CACHE[source] = filename
+            LOG_FILENAME_CACHE[(source, type)] = filename
             write_file(LOG_CACHE_FILE, str(LOG_FILENAME_CACHE))
             fp = file(alt_filename, 'a')
             # log_write_header(fp, source, (year, month, day, hour, minute, second, weekday, yearday, daylightsavings))
             return fp
         else:
-            LOG_FILENAME_CACHE[source] = filename
+            LOG_FILENAME_CACHE[(source, type)] = filename
             write_file(LOG_CACHE_FILE, str(LOG_FILENAME_CACHE))
             fp = file(filename, 'w')
             log_write_header(fp, source, (year, month, day, hour, minute, second, weekday, yearday, daylightsavings))
