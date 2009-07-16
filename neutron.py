@@ -24,7 +24,7 @@ import urllib2
 import iq
 
 ################################################################################
-iq.version = "0.5.x http://svn.hypothetic.org/neutron/branches/gh0st-dev/"
+iq.version = "0.5.2 http://neutron.googlecode.com/svn/branches/gh0st-dev/"
 iq.vername = "Neutron"
 #
 CONFIGURATION_FILE = 'dynamic/config.cfg'
@@ -612,7 +612,7 @@ if __name__ == "__main__":
 	try:	
 		start()
 	except KeyboardInterrupt:
-		print printc(color_cyan,'INTERUPT')
+		print printc(color_cyan,'INTERRUPT')
 		sys.exit(1)
 	except:
 		if AUTO_RESTART:
@@ -626,7 +626,7 @@ if __name__ == "__main__":
 			try:
 				time.sleep(3)
 			except KeyboardInterrupt:
-				print printc(color_cyan,'INTERUPT')
+				print printc(color_cyan,'INTERRUPT')
 				sys.exit(1)
 			print printc(color_cyan,'RESTARTING')
 			os.execl(sys.executable, sys.executable, sys.argv[0])

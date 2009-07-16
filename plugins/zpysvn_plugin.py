@@ -1,12 +1,22 @@
 #$ neutron_plugin 01
 
-import pysvn
+HASSVN = 1
+try:
+    import pysvn
+except:
+    HASSVN = 0
+
 import os
 
 def login(*args):
     return True, 'anonymous', 'password', False
 
 def handler_update_neutron(type, source, parameters):
+
+    if HASSVN == 0:
+	smsg(type, source, 'PySVN module not installed. Please have close look at modules/pysvn')
+	return
+
     reply = ''
     revision = ''
     update_path = ''
