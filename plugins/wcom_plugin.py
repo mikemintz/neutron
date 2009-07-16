@@ -17,7 +17,8 @@ def handler_wcom(type, source, parameters):
         param = 'UKXX0010'
         title = '\n*** Wrong format, falling back ***\n'			
     try:
-        response = urlopen('http://xoap.weather.com/weather/local/'+param+'?cc=*&dayf=1&unit=m', proxies=proxies)
+	# temporary solution, details here: http://www.rainmeter.net/forum/viewtopic.php?f=4&t=588&start=30
+        response = urlopen('http://xml.weather.com/weather/local/'+param+'?cc=*&dayf=1&unit=m', proxies=proxies)
     except:
         print "Unexpected error:", exc_info()[0]
 	
