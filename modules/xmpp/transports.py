@@ -305,7 +305,7 @@ class TLS(PlugIn):
         tcpsock._sslObj    = ssl.wrap_socket(tcpsock._sock, None, None)
         tcpsock._sslIssuer = tcpsock._sslObj.getpeercert().get('issuer')
         tcpsock._sslServer = tcpsock._sslObj.getpeercert().get('server')
-	tcpsock._recv = tcpsock._sslObj.read
+        tcpsock._recv = tcpsock._sslObj.read
         tcpsock._send = tcpsock._sslObj.write
 
         tcpsock._seen_data=1
